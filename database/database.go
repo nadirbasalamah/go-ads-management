@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"go-ads-management/models"
 	"go-ads-management/utils"
 	"log"
 
@@ -40,5 +41,9 @@ func InitDB() {
 }
 
 func Migrate() {
-	//TODO: perform database migration
+	if err := DB.AutoMigrate(&models.User{}); err != nil {
+		log.Fatalf("error when performing migration: %s\n", err)
+	}
+
+	log.Println("migration succeed")
 }

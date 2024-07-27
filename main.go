@@ -2,21 +2,19 @@ package main
 
 import (
 	"go-ads-management/database"
-	"net/http"
+	"go-ads-management/routes"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	//TODO: connect to the database
 	database.InitDB()
+	database.Migrate()
 
 	//TODO: start the server
 	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	routes.SetupRoutes(e)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
