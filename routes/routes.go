@@ -25,14 +25,26 @@ func SetupRoutes(e *echo.Echo) {
 
 	authMiddlewareConfig := jwtConfig.Init()
 
+	// user routes
 	userController := controllers.InitUserController(&jwtConfig)
+	userRoutes := e.Group("/api/v1/users")
 
-	users := e.Group("/api/v1/users")
-
-	users.POST("/register", userController.Register)
-	users.POST("/login", userController.Login)
-	users.GET("/info", userController.GetUserInfo,
+	userRoutes.POST("/register", userController.Register)
+	userRoutes.POST("/login", userController.Login)
+	userRoutes.GET("/info", userController.GetUserInfo,
 		echojwt.WithConfig(authMiddlewareConfig),
 		middlewares.VerifyToken,
 	)
+
+	// category routes
+	categoryController := controllers.InitCategoryController()
+	categoryRoutes := e.Group("/api/v1", echojwt.WithConfig(authMiddlewareConfig), middlewares.VerifyToken)
+
+	categoryRoutes.GET("/categories", categoryController.GetAll)
+	categoryRoutes.GET("/categories/:id", categoryController.GetByID)
+	categoryRoutes.POST("/categories", categoryController.Create)
+	categoryRoutes.PUT("/categories/:id", categoryController.Update)
+	categoryRoutes.DELETE("/categories/:id", categoryController.Delete)
+
+	// ads routes
 }
