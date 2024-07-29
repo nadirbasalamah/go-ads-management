@@ -11,7 +11,6 @@ func main() {
 	database.InitDB()
 	database.Migrate()
 
-	//TODO: start the server
 	e := echo.New()
 
 	routes.SetupRoutes(e)

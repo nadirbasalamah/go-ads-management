@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-ads-management/middlewares"
 	"go-ads-management/models"
 	"go-ads-management/services"
 	"net/http"
@@ -12,9 +13,9 @@ type UserController struct {
 	service services.UserService
 }
 
-func InitUserController() UserController {
+func InitUserController(jwtAuth *middlewares.JWTConfig) UserController {
 	return UserController{
-		service: services.InitUserService(),
+		service: services.InitUserService(jwtAuth),
 	}
 }
 
@@ -85,5 +86,24 @@ func (uc *UserController) Login(c echo.Context) error {
 		Status:  "success",
 		Message: "login success",
 		Data:    token,
+	})
+}
+
+func (uc *UserController) GetUserInfo(c echo.Context) error {
+	claim, err := middlewares.GetUser(c)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: "user not found",
+		})
+	}
+
+	//TODO: retrieve user information
+
+	return c.JSON(http.StatusOK, models.Response[int]{
+		Status:  "success",
+		Message: "user info",
+		Data:    claim.ID,
 	})
 }
