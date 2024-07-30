@@ -8,7 +8,7 @@ type AdsInput struct {
 	StartDate   string `json:"start_date" validate:"required"`
 	EndDate     string `json:"end_date" validate:"required"`
 	CategoryID  uint   `json:"category_id" validate:"required"`
-	UserID      uint   `json:"user_id" validate:"required"`
+	UserID      uint   `json:"user_id"`
 }
 
 func (a *AdsInput) Validate() error {

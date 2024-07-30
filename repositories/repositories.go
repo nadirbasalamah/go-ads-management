@@ -14,3 +14,11 @@ type CategoryRepository interface {
 	Update(categoryInput models.CategoryInput, id string) (models.Category, error)
 	Delete(id string) error
 }
+
+type AdsRepository interface {
+	GetAll() ([]models.Ads, error)
+	GetByID(id string) (models.Ads, error)
+	Create(adsInput models.AdsInput) (models.Ads, error)
+	Update(adsInput models.AdsInput, id string) (models.Ads, error)
+	Delete(id string) error
+}

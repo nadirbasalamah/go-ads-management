@@ -47,4 +47,12 @@ func SetupRoutes(e *echo.Echo) {
 	categoryRoutes.DELETE("/categories/:id", categoryController.Delete)
 
 	// ads routes
+	adsController := controllers.InitAdsController()
+	adsRoutes := e.Group("/api/v1", echojwt.WithConfig(authMiddlewareConfig), middlewares.VerifyToken)
+
+	adsRoutes.GET("/ads", adsController.GetAll)
+	adsRoutes.GET("/ads/:id", adsController.GetByID)
+	adsRoutes.POST("/ads", adsController.Create)
+	adsRoutes.PUT("/ads/:id", adsController.Update)
+	adsRoutes.DELETE("/ads/:id", adsController.Delete)
 }
