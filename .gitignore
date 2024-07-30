@@ -24,3 +24,5 @@ tmp/
 
 .env
 .vscode
+.air.toml
+test.session.sql

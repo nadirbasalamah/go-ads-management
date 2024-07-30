@@ -14,5 +14,5 @@ type User struct {
 	CompanyName string         `json:"company_name"`
 	Address     string         `json:"address"`
 	Email       string         `json:"email" gorm:"unique"`
-	Password    string         `json:"password"`
+	Password    string         `json:"-"`
 }
