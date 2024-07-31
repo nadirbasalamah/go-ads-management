@@ -102,9 +102,27 @@ func (cc *AdsController) Create(c echo.Context) error {
 }
 
 func (cc *AdsController) Update(c echo.Context) error {
+	claim, err := middlewares.GetUser(c)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: "user not found",
+		})
+	}
+
 	adsID := c.Param("id")
 
 	var adsInput models.AdsInput
+
+	isVerified := cc.verifyAdsOwner(adsID, uint(claim.ID))
+
+	if !isVerified {
+		return c.JSON(http.StatusUnauthorized, models.Response[string]{
+			Status:  "failed",
+			Message: "operation not permitted",
+		})
+	}
 
 	if err := c.Bind(&adsInput); err != nil {
 		return c.JSON(http.StatusBadRequest, models.Response[string]{
@@ -113,7 +131,7 @@ func (cc *AdsController) Update(c echo.Context) error {
 		})
 	}
 
-	err := adsInput.Validate()
+	err = adsInput.Validate()
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.Response[string]{
@@ -139,9 +157,27 @@ func (cc *AdsController) Update(c echo.Context) error {
 }
 
 func (cc *AdsController) Delete(c echo.Context) error {
+	claim, err := middlewares.GetUser(c)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: "user not found",
+		})
+	}
+
 	adsID := c.Param("id")
 
-	err := cc.service.Delete(adsID)
+	isVerified := cc.verifyAdsOwner(adsID, uint(claim.ID))
+
+	if !isVerified {
+		return c.JSON(http.StatusUnauthorized, models.Response[string]{
+			Status:  "failed",
+			Message: "operation not permitted",
+		})
+	}
+
+	err = cc.service.Delete(adsID)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response[string]{
@@ -154,4 +190,14 @@ func (cc *AdsController) Delete(c echo.Context) error {
 		Status:  "success",
 		Message: "ad deleted",
 	})
+}
+
+func (cc *AdsController) verifyAdsOwner(adsID string, userID uint) bool {
+	ads, err := cc.service.GetByID(adsID)
+
+	if err != nil {
+		return false
+	}
+
+	return ads.UserID == userID
 }

@@ -3,6 +3,7 @@ package routes
 import (
 	"go-ads-management/controllers"
 	"go-ads-management/middlewares"
+	"go-ads-management/models"
 	"go-ads-management/utils"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -19,14 +20,18 @@ func SetupRoutes(e *echo.Echo) {
 	e.Use(loggerMiddleware)
 
 	jwtConfig := middlewares.JWTConfig{
-		SecretKey:       utils.GetConfig("JWT_SECRET_KEY"),
-		ExpiresDuration: 1,
+		SecretKey: utils.GetConfig("JWT_SECRET_KEY"),
 	}
 
 	authMiddlewareConfig := jwtConfig.Init()
 
+	jwtOptions := models.JWTOptions{
+		SecretKey:       jwtConfig.SecretKey,
+		ExpiresDuration: 1,
+	}
+
 	// user routes
-	userController := controllers.InitUserController(&jwtConfig)
+	userController := controllers.InitUserController(jwtOptions)
 	userRoutes := e.Group("/api/v1/users")
 
 	userRoutes.POST("/register", userController.Register)

@@ -1,20 +1,20 @@
 package services
 
 import (
-	"go-ads-management/middlewares"
 	"go-ads-management/models"
 	"go-ads-management/repositories"
+	"go-ads-management/utils"
 )
 
 type UserService struct {
 	repository repositories.UserRepository
-	jwtAuth    *middlewares.JWTConfig
+	jwtOptions models.JWTOptions
 }
 
-func InitUserService(jwtAuth *middlewares.JWTConfig) UserService {
+func InitUserService(jwtOptions models.JWTOptions) UserService {
 	return UserService{
 		repository: repositories.InitUserRepository(),
-		jwtAuth:    jwtAuth,
+		jwtOptions: jwtOptions,
 	}
 }
 
@@ -29,7 +29,7 @@ func (us *UserService) Login(userInput models.LoginInput) (string, error) {
 		return "", err
 	}
 
-	token, err := us.jwtAuth.GenerateToken(int(user.ID))
+	token, err := utils.GenerateJWT(int(user.ID), us.jwtOptions)
 
 	if err != nil {
 		return "", err

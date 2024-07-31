@@ -13,9 +13,9 @@ type UserController struct {
 	service services.UserService
 }
 
-func InitUserController(jwtAuth *middlewares.JWTConfig) UserController {
+func InitUserController(jwtOptions models.JWTOptions) UserController {
 	return UserController{
-		service: services.InitUserService(jwtAuth),
+		service: services.InitUserService(jwtOptions),
 	}
 }
 
