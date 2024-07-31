@@ -59,3 +59,15 @@ func (ur *UserRepositoryImpl) GetByEmail(userInput models.LoginInput) (models.Us
 
 	return user, nil
 }
+
+func (ur *UserRepositoryImpl) GetUserInfo(id string) (models.User, error) {
+	var user models.User
+
+	err := database.DB.First(&user, "id = ?", id).Error
+
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return user, nil
+}

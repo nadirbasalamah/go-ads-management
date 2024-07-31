@@ -15,7 +15,7 @@ func InitAdsRepository() AdsRepository {
 func (cr *AdsRepositoryImpl) GetAll() ([]models.Ads, error) {
 	var ads []models.Ads
 
-	if err := database.DB.Find(&ads).Error; err != nil {
+	if err := database.DB.Preload("Category").Preload("User").Find(&ads).Error; err != nil {
 		return nil, err
 	}
 
@@ -25,7 +25,7 @@ func (cr *AdsRepositoryImpl) GetAll() ([]models.Ads, error) {
 func (cr *AdsRepositoryImpl) GetByID(id string) (models.Ads, error) {
 	var ads models.Ads
 
-	if err := database.DB.First(&ads, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Category").Preload("User").First(&ads, "id = ?", id).Error; err != nil {
 		return models.Ads{}, err
 	}
 

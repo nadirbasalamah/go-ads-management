@@ -37,3 +37,7 @@ func (us *UserService) Login(userInput models.LoginInput) (string, error) {
 
 	return token, nil
 }
+
+func (us *UserService) GetUserInfo(id string) (models.User, error) {
+	return us.repository.GetUserInfo(id)
+}

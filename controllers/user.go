@@ -5,6 +5,7 @@ import (
 	"go-ads-management/models"
 	"go-ads-management/services"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -43,7 +44,7 @@ func (uc *UserController) Register(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response[string]{
 			Status:  "failed",
-			Message: err.Error(),
+			Message: "registration failed",
 		})
 	}
 
@@ -99,11 +100,20 @@ func (uc *UserController) GetUserInfo(c echo.Context) error {
 		})
 	}
 
-	//TODO: retrieve user information
+	userID := strconv.Itoa(claim.ID)
 
-	return c.JSON(http.StatusOK, models.Response[int]{
+	user, err := uc.service.GetUserInfo(userID)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, models.Response[string]{
+			Status:  "failed",
+			Message: "user not found",
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response[models.User]{
 		Status:  "success",
 		Message: "user info",
-		Data:    claim.ID,
+		Data:    user,
 	})
 }
