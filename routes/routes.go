@@ -60,4 +60,6 @@ func SetupRoutes(e *echo.Echo) {
 	adsRoutes.POST("/ads", adsController.Create)
 	adsRoutes.PUT("/ads/:id", adsController.Update)
 	adsRoutes.DELETE("/ads/:id", adsController.Delete)
+	adsRoutes.POST("/ads/:id", adsController.Restore)
+	adsRoutes.DELETE("/ads/:id/force", adsController.ForceDelete)
 }

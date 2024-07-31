@@ -3,6 +3,8 @@ package repositories
 import (
 	"go-ads-management/database"
 	"go-ads-management/models"
+
+	"gorm.io/gorm"
 )
 
 type AdsRepositoryImpl struct {
@@ -76,6 +78,40 @@ func (cr *AdsRepositoryImpl) Update(adsInput models.AdsInput, id string) (models
 }
 
 func (cr *AdsRepositoryImpl) Delete(id string) error {
+	ads, err := cr.GetByID(id)
+
+	if err != nil {
+		return err
+	}
+
+	if err := database.DB.Delete(&ads).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cr *AdsRepositoryImpl) Restore(id string) (models.Ads, error) {
+	var ads models.Ads
+
+	err := database.DB.Unscoped().First(&ads, "id = ?", id).Error
+
+	if err != nil {
+		return models.Ads{}, err
+	}
+
+	ads.DeletedAt = gorm.DeletedAt{}
+
+	err = database.DB.Unscoped().Save(&ads).Error
+
+	if err != nil {
+		return models.Ads{}, err
+	}
+
+	return ads, nil
+}
+
+func (cr *AdsRepositoryImpl) ForceDelete(id string) error {
 	ads, err := cr.GetByID(id)
 
 	if err != nil {

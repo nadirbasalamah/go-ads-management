@@ -22,4 +22,6 @@ type AdsRepository interface {
 	Create(adsInput models.AdsInput) (models.Ads, error)
 	Update(adsInput models.AdsInput, id string) (models.Ads, error)
 	Delete(id string) error
+	Restore(id string) (models.Ads, error)
+	ForceDelete(id string) error
 }

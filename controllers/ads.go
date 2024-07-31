@@ -192,6 +192,61 @@ func (cc *AdsController) Delete(c echo.Context) error {
 	})
 }
 
+func (cc *AdsController) Restore(c echo.Context) error {
+	adsID := c.Param("id")
+
+	ads, err := cc.service.Restore(adsID)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response[string]{
+			Status:  "failed",
+			Message: "failed to restore ad",
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response[models.Ads]{
+		Status:  "success",
+		Message: "ad restored",
+		Data:    ads,
+	})
+}
+
+func (cc *AdsController) ForceDelete(c echo.Context) error {
+	claim, err := middlewares.GetUser(c)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.Response[string]{
+			Status:  "failed",
+			Message: "user not found",
+		})
+	}
+
+	adsID := c.Param("id")
+
+	isVerified := cc.verifyAdsOwner(adsID, uint(claim.ID))
+
+	if !isVerified {
+		return c.JSON(http.StatusUnauthorized, models.Response[string]{
+			Status:  "failed",
+			Message: "operation not permitted",
+		})
+	}
+
+	err = cc.service.ForceDelete(adsID)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response[string]{
+			Status:  "failed",
+			Message: "failed to delete ad",
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response[string]{
+		Status:  "success",
+		Message: "ad deleted",
+	})
+}
+
 func (cc *AdsController) verifyAdsOwner(adsID string, userID uint) bool {
 	ads, err := cc.service.GetByID(adsID)
 

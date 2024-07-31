@@ -34,3 +34,11 @@ func (cs *AdsService) Update(adsInput models.AdsInput, id string) (models.Ads, e
 func (cs *AdsService) Delete(id string) error {
 	return cs.repository.Delete(id)
 }
+
+func (cs *AdsService) Restore(id string) (models.Ads, error) {
+	return cs.repository.Restore(id)
+}
+
+func (cs *AdsService) ForceDelete(id string) error {
+	return cs.repository.ForceDelete(id)
+}
