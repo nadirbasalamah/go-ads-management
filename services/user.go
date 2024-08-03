@@ -7,23 +7,23 @@ import (
 )
 
 type UserService struct {
-	repository repositories.UserRepository
+	Repository repositories.UserRepository
 	jwtOptions models.JWTOptions
 }
 
 func InitUserService(jwtOptions models.JWTOptions) UserService {
 	return UserService{
-		repository: repositories.InitUserRepository(),
+		Repository: repositories.InitUserRepository(),
 		jwtOptions: jwtOptions,
 	}
 }
 
 func (us *UserService) Register(userInput models.RegisterInput) (models.User, error) {
-	return us.repository.Register(userInput)
+	return us.Repository.Register(userInput)
 }
 
 func (us *UserService) Login(userInput models.LoginInput) (string, error) {
-	user, err := us.repository.GetByEmail(userInput)
+	user, err := us.Repository.GetByEmail(userInput)
 
 	if err != nil {
 		return "", err
@@ -39,5 +39,5 @@ func (us *UserService) Login(userInput models.LoginInput) (string, error) {
 }
 
 func (us *UserService) GetUserInfo(id string) (models.User, error) {
-	return us.repository.GetUserInfo(id)
+	return us.Repository.GetUserInfo(id)
 }
