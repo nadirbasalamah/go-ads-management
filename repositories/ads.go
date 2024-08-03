@@ -14,14 +14,10 @@ func InitAdsRepository() AdsRepository {
 	return &AdsRepositoryImpl{}
 }
 
-func (cr *AdsRepositoryImpl) GetAll() ([]models.Ads, error) {
-	var ads []models.Ads
+func (cr *AdsRepositoryImpl) GetAll() (*gorm.DB, error) {
+	stmt := database.DB.Joins("Category").Joins("User").Model(&models.Ads{})
 
-	if err := database.DB.Preload("Category").Preload("User").Find(&ads).Error; err != nil {
-		return nil, err
-	}
-
-	return ads, nil
+	return stmt, nil
 }
 
 func (cr *AdsRepositoryImpl) GetByID(id string) (models.Ads, error) {

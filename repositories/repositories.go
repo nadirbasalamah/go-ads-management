@@ -1,6 +1,10 @@
 package repositories
 
-import "go-ads-management/models"
+import (
+	"go-ads-management/models"
+
+	"gorm.io/gorm"
+)
 
 type UserRepository interface {
 	Register(userInput models.RegisterInput) (models.User, error)
@@ -17,7 +21,7 @@ type CategoryRepository interface {
 }
 
 type AdsRepository interface {
-	GetAll() ([]models.Ads, error)
+	GetAll() (*gorm.DB, error)
 	GetByID(id string) (models.Ads, error)
 	Create(adsInput models.AdsInput) (models.Ads, error)
 	Update(adsInput models.AdsInput, id string) (models.Ads, error)

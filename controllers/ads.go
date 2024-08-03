@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/morkid/paginate"
 )
 
 type AdsController struct {
@@ -29,10 +30,14 @@ func (cc *AdsController) GetAll(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, models.Response[[]models.Ads]{
+	pg := paginate.New()
+
+	result := pg.With(ads).Request(c.Request()).Response(&[]models.Ads{})
+
+	return c.JSON(http.StatusOK, models.Response[paginate.Page]{
 		Status:  "success",
 		Message: "all ads",
-		Data:    ads,
+		Data:    result,
 	})
 }
 

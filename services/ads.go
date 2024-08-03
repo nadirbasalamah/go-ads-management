@@ -3,6 +3,8 @@ package services
 import (
 	"go-ads-management/models"
 	"go-ads-management/repositories"
+
+	"gorm.io/gorm"
 )
 
 type AdsService struct {
@@ -15,7 +17,7 @@ func InitAdsService() AdsService {
 	}
 }
 
-func (cs *AdsService) GetAll() ([]models.Ads, error) {
+func (cs *AdsService) GetAll() (*gorm.DB, error) {
 	return cs.repository.GetAll()
 }
 
