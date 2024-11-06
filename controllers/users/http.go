@@ -1,13 +1,11 @@
 package users
 
 import (
-	"go-ads-management/app/middlewares"
 	"go-ads-management/businesses/users"
 	"go-ads-management/controllers"
 	"go-ads-management/controllers/users/request"
 	"go-ads-management/controllers/users/response"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -67,15 +65,7 @@ func (uc *UserController) Login(c echo.Context) error {
 }
 
 func (uc *UserController) GetUserInfo(c echo.Context) error {
-	claim, err := middlewares.GetUser(c)
-
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
-	}
-
-	userID := strconv.Itoa(claim.ID)
-
-	user, err := uc.userUseCase.GetUserInfo(userID)
+	user, err := uc.userUseCase.GetUserInfo(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "user not found", "")

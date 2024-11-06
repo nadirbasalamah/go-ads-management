@@ -50,7 +50,7 @@ func (ac *AdsController) GetByID(c echo.Context) error {
 }
 
 func (ac *AdsController) Create(c echo.Context) error {
-	claim, err := middlewares.GetUser(c)
+	claim, err := middlewares.GetUser(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
@@ -80,7 +80,7 @@ func (ac *AdsController) Create(c echo.Context) error {
 }
 
 func (ac *AdsController) Update(c echo.Context) error {
-	claim, err := middlewares.GetUser(c)
+	claim, err := middlewares.GetUser(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
@@ -116,7 +116,7 @@ func (ac *AdsController) Update(c echo.Context) error {
 }
 
 func (ac *AdsController) Delete(c echo.Context) error {
-	claim, err := middlewares.GetUser(c)
+	claim, err := middlewares.GetUser(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
@@ -152,7 +152,7 @@ func (ac *AdsController) Restore(c echo.Context) error {
 }
 
 func (ac *AdsController) ForceDelete(c echo.Context) error {
-	claim, err := middlewares.GetUser(c)
+	claim, err := middlewares.GetUser(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"time"
@@ -19,6 +20,10 @@ type JWTConfig struct {
 	SecretKey       string
 	ExpiresDuration int
 }
+
+type contextKey string
+
+const userContextKey = contextKey("user")
 
 func (jwtConfig *JWTConfig) Init() echojwt.Config {
 	return echojwt.Config{
@@ -50,25 +55,35 @@ func (jwtCfg *JWTConfig) GenerateToken(userID int) (string, error) {
 	return token, nil
 }
 
-func GetUser(c echo.Context) (*JWTCustomClaims, error) {
-	user := c.Get("user").(*jwt.Token)
-
-	if user == nil {
-		return nil, errors.New("invalid")
+func GetUser(ctx context.Context) (*JWTCustomClaims, error) {
+	user, ok := ctx.Value(userContextKey).(*jwt.Token)
+	if !ok || user == nil {
+		return nil, errors.New("invalid token")
 	}
 
-	claims := user.Claims.(*JWTCustomClaims)
+	claims, ok := user.Claims.(*JWTCustomClaims)
+	if !ok {
+		return nil, errors.New("invalid claims")
+	}
 
 	return claims, nil
 }
 
 func VerifyToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userData, err := GetUser(c)
+		user := c.Get("user").(*jwt.Token)
 
-		isInvalid := userData == nil || err != nil
+		if user == nil {
+			return c.JSON(http.StatusUnauthorized, map[string]string{
+				"message": "invalid token",
+			})
+		}
 
-		if isInvalid {
+		ctx := context.WithValue(c.Request().Context(), userContextKey, user)
+		c.SetRequest(c.Request().WithContext(ctx))
+
+		userData, err := GetUser(ctx)
+		if userData == nil || err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]string{
 				"message": "invalid token",
 			})

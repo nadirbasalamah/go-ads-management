@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"time"
 
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ type Domain struct {
 type UseCase interface {
 	Register(userReq *Domain) (Domain, error)
 	Login(userReq *Domain) (string, error)
-	GetUserInfo(id string) (Domain, error)
+	GetUserInfo(ctx context.Context) (Domain, error)
 }
 
 type Repository interface {

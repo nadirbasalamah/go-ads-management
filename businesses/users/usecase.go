@@ -1,6 +1,11 @@
 package users
 
-import "go-ads-management/app/middlewares"
+import (
+	"context"
+	"errors"
+	"go-ads-management/app/middlewares"
+	"strconv"
+)
 
 type userUseCase struct {
 	userRepository Repository
@@ -34,6 +39,14 @@ func (usecase *userUseCase) Login(userReq *Domain) (string, error) {
 	return token, nil
 }
 
-func (usecase *userUseCase) GetUserInfo(id string) (Domain, error) {
-	return usecase.userRepository.GetUserInfo(id)
+func (usecase *userUseCase) GetUserInfo(ctx context.Context) (Domain, error) {
+	claim, err := middlewares.GetUser(ctx)
+
+	if err != nil {
+		return Domain{}, errors.New("invalid token")
+	}
+
+	userID := strconv.Itoa(claim.ID)
+
+	return usecase.userRepository.GetUserInfo(userID)
 }
