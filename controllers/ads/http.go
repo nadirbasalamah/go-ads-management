@@ -6,7 +6,7 @@ import (
 	"go-ads-management/controllers"
 	"go-ads-management/controllers/ads/request"
 	"go-ads-management/controllers/ads/response"
-	"go-ads-management/models"
+	adsRecord "go-ads-management/drivers/mysql/ads"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -32,7 +32,7 @@ func (ac *AdsController) GetAll(c echo.Context) error {
 
 	pg := paginate.New()
 
-	result := pg.With(ads).Request(c.Request()).Response(&[]models.Ads{})
+	result := pg.With(ads).Request(c.Request()).Response(&[]adsRecord.Ads{})
 
 	return controllers.NewResponse(c, http.StatusOK, "success", "all ads", result)
 }
