@@ -28,7 +28,7 @@ func (uc *UserController) Register(c echo.Context) error {
 	}
 
 	if err := c.Validate(registerReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
 	user, err := uc.userUseCase.Register(c.Request().Context(), registerReq.ToDomain())
@@ -48,7 +48,7 @@ func (uc *UserController) Login(c echo.Context) error {
 	}
 
 	if err := c.Validate(loginReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
 	token, err := uc.userUseCase.Login(c.Request().Context(), loginReq.ToDomain())

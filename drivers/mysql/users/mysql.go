@@ -19,6 +19,7 @@ func NewMySQLRepository(conn *gorm.DB) users.Repository {
 		conn: conn,
 	}
 }
+
 func (ur *userRepository) Register(ctx context.Context, userReq *users.Domain) (users.Domain, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
 

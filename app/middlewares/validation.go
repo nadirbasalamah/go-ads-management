@@ -1,11 +1,10 @@
 package middlewares
 
 import (
-	"net/http"
+	"errors"
 	"regexp"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
 )
 
 type CustomValidator struct {
@@ -34,8 +33,37 @@ func InitValidator() *validator.Validate {
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {
+	errorMessages := ""
+
 	if err := cv.Validator.Struct(i); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		for _, err := range err.(validator.ValidationErrors) {
+			errorMessages += getErrorMessage(err.Field(), err)
+		}
+
+		return errors.New(errorMessages)
 	}
 	return nil
+}
+
+func getErrorMessage(fieldName string, err validator.FieldError) string {
+	switch err.Tag() {
+	case "required":
+		return fieldName + " is required"
+	case "email":
+		return "the email is invalid"
+	case "min":
+		return "the minimum length of " + fieldName + " is equals " + err.Param()
+	case "max":
+		return "the maximum length of " + fieldName + " is equals " + err.Param()
+	case "containsNumber":
+		return "the " + fieldName + " must contains number"
+	case "containsSpecialCharacter":
+		return "the " + fieldName + " must contains special character"
+	case "validDate":
+		return "the " + fieldName + " must follows this format: DD-MM-YYYY"
+	case "gte":
+		return "the " + fieldName + " must be greater than or equal to 1"
+	default:
+		return "validation error in " + fieldName
+	}
 }

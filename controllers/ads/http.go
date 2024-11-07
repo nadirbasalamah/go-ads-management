@@ -1,7 +1,6 @@
 package ads
 
 import (
-	"go-ads-management/app/middlewares"
 	"go-ads-management/businesses/ads"
 	"go-ads-management/controllers"
 	"go-ads-management/controllers/ads/request"
@@ -50,23 +49,15 @@ func (ac *AdsController) GetByID(c echo.Context) error {
 }
 
 func (ac *AdsController) Create(c echo.Context) error {
-	claim, err := middlewares.GetUser(c.Request().Context())
-
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
-	}
-
 	adsReq := request.Ads{}
 
 	if err := c.Bind(&adsReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
+		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
 	if err := c.Validate(adsReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
-
-	adsReq.UserID = uint(claim.ID)
 
 	ads, err := ac.adsUseCase.Create(c.Request().Context(), adsReq.ToDomain())
 
@@ -83,11 +74,11 @@ func (ac *AdsController) Update(c echo.Context) error {
 	adsReq := request.Ads{}
 
 	if err := c.Bind(&adsReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
+		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
 	if err := c.Validate(adsReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
 	ads, err := ac.adsUseCase.Update(c.Request().Context(), adsReq.ToDomain(), adsID)

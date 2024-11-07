@@ -52,11 +52,11 @@ func (cc *CategoryController) Create(c echo.Context) error {
 	categoryReq := request.Category{}
 
 	if err := c.Bind(&categoryReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
+		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
 	if err := c.Validate(categoryReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "please insert all the required fields", "")
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
 	category, err := cc.categoryUseCase.Create(c.Request().Context(), categoryReq.ToDomain())
@@ -72,13 +72,13 @@ func (cc *CategoryController) Update(c echo.Context) error {
 	categoryReq := request.Category{}
 
 	if err := c.Bind(&categoryReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
+		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
 	categoryID := c.Param("id")
 
 	if err := c.Validate(categoryReq); err != nil {
-		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "please insert all the required fields", "")
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
 	category, err := cc.categoryUseCase.Update(c.Request().Context(), categoryReq.ToDomain(), categoryID)

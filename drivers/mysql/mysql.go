@@ -48,6 +48,8 @@ func MigrateDB(db *gorm.DB) {
 	if err != nil {
 		log.Fatalf("database migration failed: %v\n", err)
 	}
+
+	log.Println("database migration succeed")
 }
 
 func CloseDB(db *gorm.DB) error {

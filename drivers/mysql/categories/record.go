@@ -13,7 +13,7 @@ type Category struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
-	Name      string         `json:"name"`
+	Name      string         `json:"name" gorm:"unique"`
 }
 
 func (rec *Category) BeforeDelete(tx *gorm.DB) error {

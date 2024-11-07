@@ -86,7 +86,7 @@ func (cr *categoryRepository) Delete(ctx context.Context, id string) error {
 
 	deletedCategory := FromDomain(&category)
 
-	if err := cr.conn.WithContext(ctx).Delete(&deletedCategory).Error; err != nil {
+	if err := cr.conn.WithContext(ctx).Unscoped().Delete(&deletedCategory).Error; err != nil {
 		return err
 	}
 
