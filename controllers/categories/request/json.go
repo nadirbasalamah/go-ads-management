@@ -2,8 +2,6 @@ package request
 
 import (
 	"go-ads-management/businesses/categories"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type Category struct {
@@ -14,12 +12,4 @@ func (req *Category) ToDomain() *categories.Domain {
 	return &categories.Domain{
 		Name: req.Name,
 	}
-}
-
-func (req *Category) Validate() error {
-	validate := validator.New()
-
-	err := validate.Struct(req)
-
-	return err
 }

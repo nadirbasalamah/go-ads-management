@@ -27,9 +27,7 @@ func (uc *UserController) Register(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
-	err := registerReq.Validate()
-
-	if err != nil {
+	if err := c.Validate(registerReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
@@ -49,9 +47,7 @@ func (uc *UserController) Login(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
-	err := loginReq.Validate()
-
-	if err != nil {
+	if err := c.Validate(loginReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 

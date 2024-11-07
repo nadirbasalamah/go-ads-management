@@ -2,8 +2,6 @@ package request
 
 import (
 	"go-ads-management/businesses/users"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type UserRegister struct {
@@ -11,7 +9,7 @@ type UserRegister struct {
 	Address     string `json:"address" validate:"required"`
 	Username    string `json:"username" validate:"required"`
 	Email       string `json:"email" validate:"required,email"`
-	Password    string `json:"password" validate:"required"`
+	Password    string `json:"password" validate:"required,min=8,containsNumber,containsSpecialCharacter"`
 }
 
 type UserLogin struct {
@@ -34,16 +32,4 @@ func (req *UserLogin) ToDomain() *users.Domain {
 		Email:    req.Email,
 		Password: req.Password,
 	}
-}
-
-func (req *UserRegister) Validate() error {
-	validate := validator.New()
-
-	return validate.Struct(req)
-}
-
-func (req *UserLogin) Validate() error {
-	validate := validator.New()
-
-	return validate.Struct(req)
 }

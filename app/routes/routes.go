@@ -19,6 +19,10 @@ type ControllerList struct {
 }
 
 func (cl *ControllerList) RegisterRoute(e *echo.Echo) {
+	e.Validator = &middlewares.CustomValidator{
+		Validator: middlewares.InitValidator(),
+	}
+
 	e.Use(cl.LoggerMiddleware)
 
 	// user routes

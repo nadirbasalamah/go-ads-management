@@ -62,9 +62,7 @@ func (ac *AdsController) Create(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 
-	err = adsReq.Validate()
-
-	if err != nil {
+	if err := c.Validate(adsReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 
@@ -88,9 +86,7 @@ func (ac *AdsController) Update(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 
-	err := adsReq.Validate()
-
-	if err != nil {
+	if err := c.Validate(adsReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 

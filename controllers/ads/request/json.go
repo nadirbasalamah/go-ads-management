@@ -2,15 +2,13 @@ package request
 
 import (
 	"go-ads-management/businesses/ads"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type Ads struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description" validate:"required"`
-	StartDate   string `json:"start_date" validate:"required"`
-	EndDate     string `json:"end_date" validate:"required"`
+	StartDate   string `json:"start_date" validate:"required,validDate"`
+	EndDate     string `json:"end_date" validate:"required,validDate"`
 	CategoryID  uint   `json:"category_id" validate:"required"`
 	UserID      uint   `json:"user_id"`
 }
@@ -24,12 +22,4 @@ func (req *Ads) ToDomain() *ads.Domain {
 		CategoryID:  req.CategoryID,
 		UserID:      req.UserID,
 	}
-}
-
-func (req *Ads) Validate() error {
-	validate := validator.New()
-
-	err := validate.Struct(req)
-
-	return err
 }

@@ -55,9 +55,7 @@ func (cc *CategoryController) Create(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 
-	err := categoryReq.Validate()
-
-	if err != nil {
+	if err := c.Validate(categoryReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "please insert all the required fields", "")
 	}
 
@@ -79,9 +77,7 @@ func (cc *CategoryController) Update(c echo.Context) error {
 
 	categoryID := c.Param("id")
 
-	err := categoryReq.Validate()
-
-	if err != nil {
+	if err := c.Validate(categoryReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "please insert all the required fields", "")
 	}
 
