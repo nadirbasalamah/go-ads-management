@@ -20,13 +20,13 @@ type Domain struct {
 }
 
 type UseCase interface {
-	Register(userReq *Domain) (Domain, error)
-	Login(userReq *Domain) (string, error)
+	Register(ctx context.Context, userReq *Domain) (Domain, error)
+	Login(ctx context.Context, userReq *Domain) (string, error)
 	GetUserInfo(ctx context.Context) (Domain, error)
 }
 
 type Repository interface {
-	Register(userReq *Domain) (Domain, error)
-	GetByEmail(userReq *Domain) (Domain, error)
-	GetUserInfo(id string) (Domain, error)
+	Register(ctx context.Context, userReq *Domain) (Domain, error)
+	GetByEmail(ctx context.Context, userReq *Domain) (Domain, error)
+	GetUserInfo(ctx context.Context) (Domain, error)
 }

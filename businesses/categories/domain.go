@@ -1,6 +1,7 @@
 package categories
 
 import (
+	"context"
 	"time"
 
 	"gorm.io/gorm"
@@ -15,17 +16,17 @@ type Domain struct {
 }
 
 type UseCase interface {
-	GetAll() ([]Domain, error)
-	GetByID(id string) (Domain, error)
-	Create(categoryReq *Domain) (Domain, error)
-	Update(categoryReq *Domain, id string) (Domain, error)
-	Delete(id string) error
+	GetAll(ctx context.Context) ([]Domain, error)
+	GetByID(ctx context.Context, id string) (Domain, error)
+	Create(ctx context.Context, categoryReq *Domain) (Domain, error)
+	Update(ctx context.Context, categoryReq *Domain, id string) (Domain, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type Repository interface {
-	GetAll() ([]Domain, error)
-	GetByID(id string) (Domain, error)
-	Create(categoryReq *Domain) (Domain, error)
-	Update(categoryReq *Domain, id string) (Domain, error)
-	Delete(id string) error
+	GetAll(ctx context.Context) ([]Domain, error)
+	GetByID(ctx context.Context, id string) (Domain, error)
+	Create(ctx context.Context, categoryReq *Domain) (Domain, error)
+	Update(ctx context.Context, categoryReq *Domain, id string) (Domain, error)
+	Delete(ctx context.Context, id string) error
 }

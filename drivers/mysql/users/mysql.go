@@ -1,6 +1,9 @@
 package users
 
 import (
+	"context"
+	"errors"
+	"go-ads-management/app/middlewares"
 	"go-ads-management/businesses/users"
 
 	"golang.org/x/crypto/bcrypt"
@@ -16,7 +19,7 @@ func NewMySQLRepository(conn *gorm.DB) users.Repository {
 		conn: conn,
 	}
 }
-func (ur *userRepository) Register(userReq *users.Domain) (users.Domain, error) {
+func (ur *userRepository) Register(ctx context.Context, userReq *users.Domain) (users.Domain, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -27,23 +30,23 @@ func (ur *userRepository) Register(userReq *users.Domain) (users.Domain, error) 
 
 	record.Password = string(password)
 
-	result := ur.conn.Create(&record)
+	result := ur.conn.WithContext(ctx).Create(&record)
 
 	if err := result.Error; err != nil {
 		return users.Domain{}, err
 	}
 
-	if err := result.Last(&record).Error; err != nil {
+	if err := result.WithContext(ctx).Last(&record).Error; err != nil {
 		return users.Domain{}, err
 	}
 
 	return record.ToDomain(), nil
 }
 
-func (ur *userRepository) GetByEmail(userReq *users.Domain) (users.Domain, error) {
+func (ur *userRepository) GetByEmail(ctx context.Context, userReq *users.Domain) (users.Domain, error) {
 	var user User
 
-	err := ur.conn.First(&user, "email = ?", userReq.Email).Error
+	err := ur.conn.WithContext(ctx).First(&user, "email = ?", userReq.Email).Error
 
 	if err != nil {
 		return users.Domain{}, err
@@ -58,10 +61,16 @@ func (ur *userRepository) GetByEmail(userReq *users.Domain) (users.Domain, error
 	return user.ToDomain(), nil
 }
 
-func (ur *userRepository) GetUserInfo(id string) (users.Domain, error) {
+func (ur *userRepository) GetUserInfo(ctx context.Context) (users.Domain, error) {
+	id, err := middlewares.GetUserID(ctx)
+
+	if err != nil {
+		return users.Domain{}, errors.New("invalid token")
+	}
+
 	var user User
 
-	err := ur.conn.First(&user, "id = ?", id).Error
+	err = ur.conn.WithContext(ctx).First(&user, "id = ?", id).Error
 
 	if err != nil {
 		return users.Domain{}, err

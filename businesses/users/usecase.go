@@ -2,9 +2,7 @@ package users
 
 import (
 	"context"
-	"errors"
 	"go-ads-management/app/middlewares"
-	"strconv"
 )
 
 type userUseCase struct {
@@ -19,12 +17,12 @@ func NewUserUseCase(repository Repository, jwtConfig *middlewares.JWTConfig) Use
 	}
 }
 
-func (usecase *userUseCase) Register(userReq *Domain) (Domain, error) {
-	return usecase.userRepository.Register(userReq)
+func (usecase *userUseCase) Register(ctx context.Context, userReq *Domain) (Domain, error) {
+	return usecase.userRepository.Register(ctx, userReq)
 }
 
-func (usecase *userUseCase) Login(userReq *Domain) (string, error) {
-	user, err := usecase.userRepository.GetByEmail(userReq)
+func (usecase *userUseCase) Login(ctx context.Context, userReq *Domain) (string, error) {
+	user, err := usecase.userRepository.GetByEmail(ctx, userReq)
 
 	if err != nil {
 		return "", err
@@ -40,13 +38,5 @@ func (usecase *userUseCase) Login(userReq *Domain) (string, error) {
 }
 
 func (usecase *userUseCase) GetUserInfo(ctx context.Context) (Domain, error) {
-	claim, err := middlewares.GetUser(ctx)
-
-	if err != nil {
-		return Domain{}, errors.New("invalid token")
-	}
-
-	userID := strconv.Itoa(claim.ID)
-
-	return usecase.userRepository.GetUserInfo(userID)
+	return usecase.userRepository.GetUserInfo(ctx)
 }

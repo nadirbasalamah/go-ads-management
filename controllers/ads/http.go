@@ -24,7 +24,7 @@ func NewAdsController(adsUC ads.UseCase) *AdsController {
 }
 
 func (ac *AdsController) GetAll(c echo.Context) error {
-	ads, err := ac.adsUseCase.GetAll()
+	ads, err := ac.adsUseCase.GetAll(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to fetch ads", "")
@@ -40,7 +40,7 @@ func (ac *AdsController) GetAll(c echo.Context) error {
 func (ac *AdsController) GetByID(c echo.Context) error {
 	adsID := c.Param("id")
 
-	ads, err := ac.adsUseCase.GetByID(adsID)
+	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), adsID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "ad not found", "")
@@ -70,7 +70,7 @@ func (ac *AdsController) Create(c echo.Context) error {
 
 	adsReq.UserID = uint(claim.ID)
 
-	ads, err := ac.adsUseCase.Create(adsReq.ToDomain())
+	ads, err := ac.adsUseCase.Create(c.Request().Context(), adsReq.ToDomain())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to create an ad", "")
@@ -80,33 +80,21 @@ func (ac *AdsController) Create(c echo.Context) error {
 }
 
 func (ac *AdsController) Update(c echo.Context) error {
-	claim, err := middlewares.GetUser(c.Request().Context())
-
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
-	}
-
 	adsID := c.Param("id")
 
 	adsReq := request.Ads{}
-
-	isVerified := ac.verifyAdsOwner(adsID, uint(claim.ID))
-
-	if !isVerified {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "operation not permitted", "")
-	}
 
 	if err := c.Bind(&adsReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 
-	err = adsReq.Validate()
+	err := adsReq.Validate()
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid input", "")
 	}
 
-	ads, err := ac.adsUseCase.Update(adsReq.ToDomain(), adsID)
+	ads, err := ac.adsUseCase.Update(c.Request().Context(), adsReq.ToDomain(), adsID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to update an ad", "")
@@ -116,21 +104,9 @@ func (ac *AdsController) Update(c echo.Context) error {
 }
 
 func (ac *AdsController) Delete(c echo.Context) error {
-	claim, err := middlewares.GetUser(c.Request().Context())
-
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
-	}
-
 	adsID := c.Param("id")
 
-	isVerified := ac.verifyAdsOwner(adsID, uint(claim.ID))
-
-	if !isVerified {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "operation not permitted", "")
-	}
-
-	err = ac.adsUseCase.Delete(adsID)
+	err := ac.adsUseCase.Delete(c.Request().Context(), adsID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete an ad", "")
@@ -142,7 +118,7 @@ func (ac *AdsController) Delete(c echo.Context) error {
 func (ac *AdsController) Restore(c echo.Context) error {
 	adsID := c.Param("id")
 
-	ads, err := ac.adsUseCase.Restore(adsID)
+	ads, err := ac.adsUseCase.Restore(c.Request().Context(), adsID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to restore an ad", "")
@@ -152,35 +128,13 @@ func (ac *AdsController) Restore(c echo.Context) error {
 }
 
 func (ac *AdsController) ForceDelete(c echo.Context) error {
-	claim, err := middlewares.GetUser(c.Request().Context())
-
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "invalid token", "")
-	}
-
 	adsID := c.Param("id")
 
-	isVerified := ac.verifyAdsOwner(adsID, uint(claim.ID))
-
-	if !isVerified {
-		return controllers.NewResponse(c, http.StatusUnauthorized, "failed", "operation not permitted", "")
-	}
-
-	err = ac.adsUseCase.ForceDelete(adsID)
+	err := ac.adsUseCase.ForceDelete(c.Request().Context(), adsID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete an ad", "")
 	}
 
 	return controllers.NewResponse(c, http.StatusOK, "success", "ad deleted", "")
-}
-
-func (ac *AdsController) verifyAdsOwner(adsID string, userID uint) bool {
-	ads, err := ac.adsUseCase.GetByID(adsID)
-
-	if err != nil {
-		return false
-	}
-
-	return ads.UserID == userID
 }

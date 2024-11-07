@@ -69,6 +69,16 @@ func GetUser(ctx context.Context) (*JWTCustomClaims, error) {
 	return claims, nil
 }
 
+func GetUserID(ctx context.Context) (int, error) {
+	claim, err := GetUser(ctx)
+
+	if err != nil {
+		return 0, errors.New("invalid token")
+	}
+
+	return claim.ID, nil
+}
+
 func VerifyToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)

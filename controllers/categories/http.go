@@ -21,7 +21,7 @@ func NewCategoryController(categoryUC categories.UseCase) *CategoryController {
 }
 
 func (cc *CategoryController) GetAll(c echo.Context) error {
-	categoryRecords, err := cc.categoryUseCase.GetAll()
+	categoryRecords, err := cc.categoryUseCase.GetAll(c.Request().Context())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to fetch categories", "")
@@ -39,7 +39,7 @@ func (cc *CategoryController) GetAll(c echo.Context) error {
 func (cc *CategoryController) GetByID(c echo.Context) error {
 	categoryID := c.Param("id")
 
-	category, err := cc.categoryUseCase.GetByID(categoryID)
+	category, err := cc.categoryUseCase.GetByID(c.Request().Context(), categoryID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "category not found", "")
@@ -61,7 +61,7 @@ func (cc *CategoryController) Create(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "please insert all the required fields", "")
 	}
 
-	category, err := cc.categoryUseCase.Create(categoryReq.ToDomain())
+	category, err := cc.categoryUseCase.Create(c.Request().Context(), categoryReq.ToDomain())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to create a category", "")
@@ -85,7 +85,7 @@ func (cc *CategoryController) Update(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "please insert all the required fields", "")
 	}
 
-	category, err := cc.categoryUseCase.Update(categoryReq.ToDomain(), categoryID)
+	category, err := cc.categoryUseCase.Update(c.Request().Context(), categoryReq.ToDomain(), categoryID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to update a category", "")
@@ -97,7 +97,7 @@ func (cc *CategoryController) Update(c echo.Context) error {
 func (cc *CategoryController) Delete(c echo.Context) error {
 	categoryID := c.Param("id")
 
-	err := cc.categoryUseCase.Delete(categoryID)
+	err := cc.categoryUseCase.Delete(c.Request().Context(), categoryID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete a category", "")

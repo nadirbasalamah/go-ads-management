@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"context"
 	"time"
 
 	"gorm.io/gorm"
@@ -22,21 +23,21 @@ type Domain struct {
 }
 
 type UseCase interface {
-	GetAll() (*gorm.DB, error)
-	GetByID(id string) (Domain, error)
-	Create(adsReq *Domain) (Domain, error)
-	Update(adsReq *Domain, id string) (Domain, error)
-	Delete(id string) error
-	Restore(id string) (Domain, error)
-	ForceDelete(id string) error
+	GetAll(ctx context.Context) (*gorm.DB, error)
+	GetByID(ctx context.Context, id string) (Domain, error)
+	Create(ctx context.Context, adsReq *Domain) (Domain, error)
+	Update(ctx context.Context, adsReq *Domain, id string) (Domain, error)
+	Delete(ctx context.Context, id string) error
+	Restore(ctx context.Context, id string) (Domain, error)
+	ForceDelete(ctx context.Context, id string) error
 }
 
 type Repository interface {
-	GetAll() (*gorm.DB, error)
-	GetByID(id string) (Domain, error)
-	Create(adsReq *Domain) (Domain, error)
-	Update(adsReq *Domain, id string) (Domain, error)
-	Delete(id string) error
-	Restore(id string) (Domain, error)
-	ForceDelete(id string) error
+	GetAll(ctx context.Context) (*gorm.DB, error)
+	GetByID(ctx context.Context, id string) (Domain, error)
+	Create(ctx context.Context, adsReq *Domain) (Domain, error)
+	Update(ctx context.Context, adsReq *Domain, id string) (Domain, error)
+	Delete(ctx context.Context, id string) error
+	Restore(ctx context.Context, id string) (Domain, error)
+	ForceDelete(ctx context.Context, id string) error
 }

@@ -33,7 +33,7 @@ func (uc *UserController) Register(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
-	user, err := uc.userUseCase.Register(registerReq.ToDomain())
+	user, err := uc.userUseCase.Register(c.Request().Context(), registerReq.ToDomain())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "registration failed", "")
@@ -55,7 +55,7 @@ func (uc *UserController) Login(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
-	token, err := uc.userUseCase.Login(loginReq.ToDomain())
+	token, err := uc.userUseCase.Login(c.Request().Context(), loginReq.ToDomain())
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid email or password", "")

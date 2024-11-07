@@ -1,5 +1,7 @@
 package categories
 
+import "context"
+
 type categoryUseCase struct {
 	categoryRepository Repository
 }
@@ -10,22 +12,22 @@ func NewCategoryUseCase(repository Repository) UseCase {
 	}
 }
 
-func (usecase *categoryUseCase) GetAll() ([]Domain, error) {
-	return usecase.categoryRepository.GetAll()
+func (usecase *categoryUseCase) GetAll(ctx context.Context) ([]Domain, error) {
+	return usecase.categoryRepository.GetAll(ctx)
 }
 
-func (usecase *categoryUseCase) GetByID(id string) (Domain, error) {
-	return usecase.categoryRepository.GetByID(id)
+func (usecase *categoryUseCase) GetByID(ctx context.Context, id string) (Domain, error) {
+	return usecase.categoryRepository.GetByID(ctx, id)
 }
 
-func (usecase *categoryUseCase) Create(categoryReq *Domain) (Domain, error) {
-	return usecase.categoryRepository.Create(categoryReq)
+func (usecase *categoryUseCase) Create(ctx context.Context, categoryReq *Domain) (Domain, error) {
+	return usecase.categoryRepository.Create(ctx, categoryReq)
 }
 
-func (usecase *categoryUseCase) Update(categoryReq *Domain, id string) (Domain, error) {
-	return usecase.categoryRepository.Update(categoryReq, id)
+func (usecase *categoryUseCase) Update(ctx context.Context, categoryReq *Domain, id string) (Domain, error) {
+	return usecase.categoryRepository.Update(ctx, categoryReq, id)
 }
 
-func (usecase *categoryUseCase) Delete(id string) error {
-	return usecase.categoryRepository.Delete(id)
+func (usecase *categoryUseCase) Delete(ctx context.Context, id string) error {
+	return usecase.categoryRepository.Delete(ctx, id)
 }
