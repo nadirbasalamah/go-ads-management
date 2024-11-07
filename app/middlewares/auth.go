@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 	"errors"
+	"go-ads-management/utils"
 	"net/http"
 	"time"
 
@@ -12,7 +13,8 @@ import (
 )
 
 type JWTCustomClaims struct {
-	ID int `json:"id"`
+	ID   int        `json:"id"`
+	Role utils.Role `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -34,7 +36,7 @@ func (jwtConfig *JWTConfig) Init() echojwt.Config {
 	}
 }
 
-func (jwtCfg *JWTConfig) GenerateToken(userID int) (string, error) {
+func (jwtCfg *JWTConfig) GenerateToken(userID int, role utils.Role) (string, error) {
 	expire := jwt.NewNumericDate(time.Now().Local().Add(time.Hour * time.Duration(int64(jwtCfg.ExpiresDuration))))
 
 	claims := &JWTCustomClaims{
@@ -42,6 +44,7 @@ func (jwtCfg *JWTConfig) GenerateToken(userID int) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: expire,
 		},
+		Role: role,
 	}
 
 	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -96,6 +99,26 @@ func VerifyToken(next echo.HandlerFunc) echo.HandlerFunc {
 		if userData == nil || err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]string{
 				"message": "invalid token",
+			})
+		}
+
+		return next(c)
+	}
+}
+
+func VerifyAdmin(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		user, err := GetUser(c.Request().Context())
+
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, map[string]string{
+				"message": "invalid token",
+			})
+		}
+
+		if user.Role != utils.ROLE_ADMIN {
+			return c.JSON(http.StatusForbidden, map[string]string{
+				"message": "access denied",
 			})
 		}
 

@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"go-ads-management/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,6 +18,7 @@ type Domain struct {
 	Username    string
 	Email       string
 	Password    string
+	Role        utils.Role
 }
 
 type UseCase interface {

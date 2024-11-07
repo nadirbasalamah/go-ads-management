@@ -28,7 +28,7 @@ func (usecase *userUseCase) Login(ctx context.Context, userReq *Domain) (string,
 		return "", err
 	}
 
-	token, err := usecase.jwtConfig.GenerateToken(int(user.ID))
+	token, err := usecase.jwtConfig.GenerateToken(int(user.ID), user.Role)
 
 	if err != nil {
 		return "", err

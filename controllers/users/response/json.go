@@ -2,6 +2,7 @@ package response
 
 import (
 	"go-ads-management/businesses/users"
+	"go-ads-management/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,6 +18,7 @@ type User struct {
 	Username    string         `json:"username"`
 	Email       string         `json:"email"`
 	Password    string         `json:"-"`
+	Role        utils.Role     `json:"role"`
 }
 
 func FromDomain(domain users.Domain) User {
@@ -30,5 +32,6 @@ func FromDomain(domain users.Domain) User {
 		Username:    domain.Username,
 		Email:       domain.Email,
 		Password:    domain.Password,
+		Role:        domain.Role,
 	}
 }

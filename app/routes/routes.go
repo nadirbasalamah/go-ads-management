@@ -42,9 +42,10 @@ func (cl *ControllerList) RegisterRoute(e *echo.Echo) {
 
 	categoryRoutes.GET("/categories", cl.CategoryController.GetAll)
 	categoryRoutes.GET("/categories/:id", cl.CategoryController.GetByID)
-	categoryRoutes.POST("/categories", cl.CategoryController.Create)
-	categoryRoutes.PUT("/categories/:id", cl.CategoryController.Update)
-	categoryRoutes.DELETE("/categories/:id", cl.CategoryController.Delete)
+
+	categoryRoutes.POST("/categories", cl.CategoryController.Create, middlewares.VerifyAdmin)
+	categoryRoutes.PUT("/categories/:id", cl.CategoryController.Update, middlewares.VerifyAdmin)
+	categoryRoutes.DELETE("/categories/:id", cl.CategoryController.Delete, middlewares.VerifyAdmin)
 
 	// ads routes
 	adsRoutes := e.Group("/api/v1", echojwt.WithConfig(cl.JWTMiddleware), middlewares.VerifyToken)

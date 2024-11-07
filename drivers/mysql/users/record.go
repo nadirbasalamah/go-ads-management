@@ -2,6 +2,7 @@ package users
 
 import (
 	"go-ads-management/businesses/users"
+	"go-ads-management/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,6 +18,13 @@ type User struct {
 	Username    string         `json:"username"`
 	Email       string         `json:"email" gorm:"unique"`
 	Password    string         `json:"-"`
+	Role        utils.Role     `json:"role" gorm:"type:enum('user','admin')"`
+}
+
+func (rec *User) BeforeCreate(tx *gorm.DB) (err error) {
+	rec.Role = utils.ROLE_USER
+
+	return nil
 }
 
 func (rec *User) ToDomain() users.Domain {
@@ -30,6 +38,7 @@ func (rec *User) ToDomain() users.Domain {
 		Username:    rec.Username,
 		Email:       rec.Email,
 		Password:    rec.Password,
+		Role:        rec.Role,
 	}
 }
 
@@ -44,5 +53,6 @@ func FromDomain(domain *users.Domain) *User {
 		Username:    domain.Username,
 		Email:       domain.Email,
 		Password:    domain.Password,
+		Role:        domain.Role,
 	}
 }
