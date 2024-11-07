@@ -24,6 +24,18 @@ func (usecase *adsUseCase) GetByID(ctx context.Context, id string) (Domain, erro
 	return usecase.adsRepository.GetByID(ctx, id)
 }
 
+func (usecase *adsUseCase) GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error) {
+	return usecase.adsRepository.GetByCategory(ctx, categoryID)
+}
+
+func (usecase *adsUseCase) GetByUser(ctx context.Context) (*gorm.DB, error) {
+	return usecase.adsRepository.GetByUser(ctx)
+}
+
+func (usecase *adsUseCase) GetTrashed(ctx context.Context) (*gorm.DB, error) {
+	return usecase.adsRepository.GetTrashed(ctx)
+}
+
 func (usecase *adsUseCase) Create(ctx context.Context, adsReq *Domain) (Domain, error) {
 	return usecase.adsRepository.Create(ctx, adsReq)
 }

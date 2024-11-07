@@ -35,6 +35,30 @@ func (ar *adsRepository) GetByID(ctx context.Context, id string) (ads.Domain, er
 	return adsData.ToDomain(), nil
 }
 
+func (ar *adsRepository) GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error) {
+	stmt := ar.conn.WithContext(ctx).Joins("Category").Joins("User").Where("category_id = ?", categoryID).Model(Ads{})
+
+	return stmt, nil
+}
+
+func (ar *adsRepository) GetByUser(ctx context.Context) (*gorm.DB, error) {
+	userID, err := middlewares.GetUserID(ctx)
+
+	if err != nil {
+		return nil, errors.New("invalid token")
+	}
+
+	stmt := ar.conn.WithContext(ctx).Joins("Category").Joins("User").Where("user_id = ?", userID).Model(Ads{})
+
+	return stmt, nil
+}
+
+func (ar *adsRepository) GetTrashed(ctx context.Context) (*gorm.DB, error) {
+	stmt := ar.conn.WithContext(ctx).Unscoped().Joins("Category").Joins("User").Where("ads.deleted_at IS NOT NULL").Model(Ads{})
+
+	return stmt, nil
+}
+
 func (ar *adsRepository) Create(ctx context.Context, adsReq *ads.Domain) (ads.Domain, error) {
 	userID, err := middlewares.GetUserID(ctx)
 

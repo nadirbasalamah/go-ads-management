@@ -51,6 +51,9 @@ func (cl *ControllerList) RegisterRoute(e *echo.Echo) {
 
 	adsRoutes.GET("/ads", cl.AdsController.GetAll)
 	adsRoutes.GET("/ads/:id", cl.AdsController.GetByID)
+	adsRoutes.GET("/ads/category/:category_id", cl.AdsController.GetByCategory)
+	adsRoutes.GET("/ads/user", cl.AdsController.GetByUser)
+	adsRoutes.GET("/ads/trashed", cl.AdsController.GetTrashed)
 	adsRoutes.POST("/ads", cl.AdsController.Create)
 	adsRoutes.PUT("/ads/:id", cl.AdsController.Update)
 	adsRoutes.DELETE("/ads/:id", cl.AdsController.Delete)

@@ -25,6 +25,9 @@ type Domain struct {
 type UseCase interface {
 	GetAll(ctx context.Context) (*gorm.DB, error)
 	GetByID(ctx context.Context, id string) (Domain, error)
+	GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error)
+	GetByUser(ctx context.Context) (*gorm.DB, error)
+	GetTrashed(ctx context.Context) (*gorm.DB, error)
 	Create(ctx context.Context, adsReq *Domain) (Domain, error)
 	Update(ctx context.Context, adsReq *Domain, id string) (Domain, error)
 	Delete(ctx context.Context, id string) error
@@ -35,6 +38,9 @@ type UseCase interface {
 type Repository interface {
 	GetAll(ctx context.Context) (*gorm.DB, error)
 	GetByID(ctx context.Context, id string) (Domain, error)
+	GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error)
+	GetByUser(ctx context.Context) (*gorm.DB, error)
+	GetTrashed(ctx context.Context) (*gorm.DB, error)
 	Create(ctx context.Context, adsReq *Domain) (Domain, error)
 	Update(ctx context.Context, adsReq *Domain, id string) (Domain, error)
 	Delete(ctx context.Context, id string) error

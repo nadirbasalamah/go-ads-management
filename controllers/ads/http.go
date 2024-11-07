@@ -48,6 +48,50 @@ func (ac *AdsController) GetByID(c echo.Context) error {
 	return controllers.NewResponse(c, http.StatusOK, "success", "ad found", response.FromDomain(ads))
 }
 
+func (ac *AdsController) GetByCategory(c echo.Context) error {
+	categoryID := c.Param("category_id")
+
+	ads, err := ac.adsUseCase.GetByCategory(c.Request().Context(), categoryID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to fetch ads", "")
+	}
+
+	pg := paginate.New()
+
+	result := pg.With(ads).Request(c.Request()).Response(&[]adsRecord.Ads{})
+
+	return controllers.NewResponse(c, http.StatusOK, "success", "all ads", result)
+}
+
+func (ac *AdsController) GetByUser(c echo.Context) error {
+	ads, err := ac.adsUseCase.GetByUser(c.Request().Context())
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to fetch ads", "")
+	}
+
+	pg := paginate.New()
+
+	result := pg.With(ads).Request(c.Request()).Response(&[]adsRecord.Ads{})
+
+	return controllers.NewResponse(c, http.StatusOK, "success", "all ads", result)
+}
+
+func (ac *AdsController) GetTrashed(c echo.Context) error {
+	ads, err := ac.adsUseCase.GetTrashed(c.Request().Context())
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to fetch ads", "")
+	}
+
+	pg := paginate.New()
+
+	result := pg.With(ads).Request(c.Request()).Response(&[]adsRecord.Ads{})
+
+	return controllers.NewResponse(c, http.StatusOK, "success", "all trashed ads", result)
+}
+
 func (ac *AdsController) Create(c echo.Context) error {
 	adsReq := request.Ads{}
 
