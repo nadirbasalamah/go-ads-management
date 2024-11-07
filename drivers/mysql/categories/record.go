@@ -1,6 +1,7 @@
 package categories
 
 import (
+	"errors"
 	"go-ads-management/businesses/categories"
 	"time"
 
@@ -13,6 +14,21 @@ type Category struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 	Name      string         `json:"name"`
+}
+
+func (rec *Category) BeforeDelete(tx *gorm.DB) error {
+	var count int64
+
+	err := tx.Table("ads").Where("category_id = ?", rec.ID).Count(&count).Error
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return errors.New("cannot delete category: it is still being used in advertisements")
+	}
+
+	return nil
 }
 
 func (rec *Category) ToDomain() categories.Domain {
