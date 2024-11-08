@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go-ads-management/app/middlewares"
 	"go-ads-management/businesses/users"
+	"go-ads-management/utils"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -42,6 +43,28 @@ func (ur *userRepository) Register(ctx context.Context, userReq *users.Domain) (
 	}
 
 	return record.ToDomain(), nil
+}
+
+func (ur *userRepository) CreateAdmin(ctx context.Context, userReq *users.Domain) (users.Domain, error) {
+	var count int64
+
+	err := ur.conn.WithContext(ctx).Model(&User{}).Where("role = ?", utils.ROLE_ADMIN).Count(&count).Error
+
+	if err != nil {
+		return users.Domain{}, err
+	}
+
+	if count == 1 {
+		return users.Domain{}, errors.New("admin already exists")
+	}
+
+	user, err := ur.Register(ctx, userReq)
+
+	if err != nil {
+		return users.Domain{}, err
+	}
+
+	return user, nil
 }
 
 func (ur *userRepository) GetByEmail(ctx context.Context, userReq *users.Domain) (users.Domain, error) {

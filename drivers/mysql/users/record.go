@@ -22,7 +22,11 @@ type User struct {
 }
 
 func (rec *User) BeforeCreate(tx *gorm.DB) (err error) {
-	rec.Role = utils.ROLE_USER
+	if rec.Role == utils.ROLE_ADMIN {
+		rec.Role = utils.ROLE_ADMIN
+	} else {
+		rec.Role = utils.ROLE_USER
+	}
 
 	return nil
 }

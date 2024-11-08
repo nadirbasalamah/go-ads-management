@@ -29,6 +29,7 @@ type UseCase interface {
 
 type Repository interface {
 	Register(ctx context.Context, userReq *Domain) (Domain, error)
+	CreateAdmin(ctx context.Context, userReq *Domain) (Domain, error)
 	GetByEmail(ctx context.Context, userReq *Domain) (Domain, error)
 	GetUserInfo(ctx context.Context) (Domain, error)
 }
