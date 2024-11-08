@@ -22,6 +22,7 @@ type Domain struct {
 	UserName     string
 	MediaURL     string
 	MediaCID     string
+	MediaID      string
 }
 
 type UseCase interface {

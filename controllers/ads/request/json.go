@@ -14,6 +14,7 @@ type Ads struct {
 	File        *multipart.FileHeader
 	MediaURL    string
 	MediaCID    string
+	MediaID     string
 }
 
 func (req *Ads) ToDomain() *ads.Domain {
@@ -25,5 +26,6 @@ func (req *Ads) ToDomain() *ads.Domain {
 		CategoryID:  req.CategoryID,
 		MediaURL:    req.MediaURL,
 		MediaCID:    req.MediaCID,
+		MediaID:     req.MediaID,
 	}
 }

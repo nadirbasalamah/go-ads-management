@@ -120,20 +120,15 @@ func (ac *AdsController) Create(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "invalid file format", "")
 	}
 
-	cid, err := pinata.UploadFile(file)
+	res, err := pinata.UploadFile(file)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "upload failed", "")
 	}
 
-	fileURL, err := pinata.GetSignedURL(cid)
-
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to get file URL", "")
-	}
-
-	adsReq.MediaURL = fileURL
-	adsReq.MediaCID = cid
+	adsReq.MediaURL = res.SignedURL
+	adsReq.MediaCID = res.FileCID
+	adsReq.MediaID = res.FileID
 
 	ads, err := ac.adsUseCase.Create(c.Request().Context(), adsReq.ToDomain())
 

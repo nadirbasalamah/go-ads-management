@@ -24,6 +24,7 @@ type Ads struct {
 	UserID      uint                `json:"user_id"`
 	MediaURL    string              `json:"media_url"`
 	MediaCID    string              `json:"media_cid" gorm:"column:media_cid"`
+	MediaID     string              `json:"media_id"`
 }
 
 func (rec *Ads) ToDomain() ads.Domain {
@@ -42,6 +43,7 @@ func (rec *Ads) ToDomain() ads.Domain {
 		UserName:     rec.User.Username,
 		MediaURL:     rec.MediaURL,
 		MediaCID:     rec.MediaCID,
+		MediaID:      rec.MediaID,
 	}
 }
 
@@ -59,5 +61,6 @@ func FromDomain(domain *ads.Domain) *Ads {
 		UserID:      domain.UserID,
 		MediaURL:    domain.MediaURL,
 		MediaCID:    domain.MediaCID,
+		MediaID:     domain.MediaID,
 	}
 }
