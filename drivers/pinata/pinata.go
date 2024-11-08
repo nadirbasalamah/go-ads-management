@@ -106,10 +106,10 @@ func UploadFile(file *multipart.FileHeader) (string, error) {
 		return "", errors.New("file upload failed")
 	}
 
-	return getSignedURL(uploadResponse.Data.Cid)
+	return uploadResponse.Data.Cid, nil
 }
 
-func getSignedURL(cid string) (string, error) {
+func GetSignedURL(cid string) (string, error) {
 	url := "https://api.pinata.cloud/v3/files/sign"
 
 	gateway := utils.GetConfig("PINATA_GATEWAY")

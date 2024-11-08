@@ -5,7 +5,6 @@ import (
 	"go-ads-management/controllers/ads"
 	"go-ads-management/controllers/categories"
 	"go-ads-management/controllers/users"
-	"go-ads-management/drivers/pinata"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -25,28 +24,6 @@ func (cl *ControllerList) RegisterRoute(e *echo.Echo) {
 	}
 
 	e.Use(cl.LoggerMiddleware)
-
-	// TEST ONLY, will be removed later
-	e.POST("/upload", func(c echo.Context) error {
-		// Retrieve the file from the form input
-		file, err := c.FormFile("file")
-		if err != nil {
-			return err
-		}
-
-		url, err := pinata.UploadFile(file)
-
-		if err != nil {
-			return c.JSON(500, echo.Map{
-				"error": err,
-			})
-		}
-
-		return c.JSON(200, echo.Map{
-			"message": "upload success",
-			"url":     url,
-		})
-	})
 
 	// user routes
 	userRoutes := e.Group("/api/v1/users")

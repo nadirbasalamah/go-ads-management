@@ -22,6 +22,8 @@ type Ads struct {
 	CategoryID  uint                `json:"category_id"`
 	User        users.User          `json:"user"`
 	UserID      uint                `json:"user_id"`
+	MediaURL    string              `json:"media_url"`
+	MediaCID    string              `json:"media_cid" gorm:"column:media_cid"`
 }
 
 func (rec *Ads) ToDomain() ads.Domain {
@@ -38,6 +40,8 @@ func (rec *Ads) ToDomain() ads.Domain {
 		CategoryName: rec.Category.Name,
 		UserID:       rec.User.ID,
 		UserName:     rec.User.Username,
+		MediaURL:     rec.MediaURL,
+		MediaCID:     rec.MediaCID,
 	}
 }
 
@@ -53,5 +57,7 @@ func FromDomain(domain *ads.Domain) *Ads {
 		EndDate:     domain.EndDate,
 		CategoryID:  domain.CategoryID,
 		UserID:      domain.UserID,
+		MediaURL:    domain.MediaURL,
+		MediaCID:    domain.MediaCID,
 	}
 }

@@ -20,6 +20,8 @@ type Domain struct {
 	CategoryName string
 	UserID       uint
 	UserName     string
+	MediaURL     string
+	MediaCID     string
 }
 
 type UseCase interface {

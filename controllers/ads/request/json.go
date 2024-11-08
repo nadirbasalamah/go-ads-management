@@ -2,15 +2,18 @@ package request
 
 import (
 	"go-ads-management/businesses/ads"
+	"mime/multipart"
 )
 
 type Ads struct {
-	Title       string `json:"title" validate:"required"`
-	Description string `json:"description" validate:"required"`
-	StartDate   string `json:"start_date" validate:"required,validDate"`
-	EndDate     string `json:"end_date" validate:"required,validDate"`
-	CategoryID  uint   `json:"category_id" validate:"required"`
-	UserID      uint   `json:"user_id"`
+	Title       string `form:"title" validate:"required"`
+	Description string `form:"description" validate:"required"`
+	StartDate   string `form:"start_date" validate:"required,validDate"`
+	EndDate     string `form:"end_date" validate:"required,validDate"`
+	CategoryID  uint   `form:"category_id" validate:"required"`
+	File        *multipart.FileHeader
+	MediaURL    string
+	MediaCID    string
 }
 
 func (req *Ads) ToDomain() *ads.Domain {
@@ -20,6 +23,7 @@ func (req *Ads) ToDomain() *ads.Domain {
 		StartDate:   req.StartDate,
 		EndDate:     req.EndDate,
 		CategoryID:  req.CategoryID,
-		UserID:      req.UserID,
+		MediaURL:    req.MediaURL,
+		MediaCID:    req.MediaCID,
 	}
 }

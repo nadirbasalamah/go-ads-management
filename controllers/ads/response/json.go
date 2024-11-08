@@ -20,6 +20,8 @@ type Ads struct {
 	CategoryName string         `json:"category_name"`
 	UserID       uint           `json:"user_id"`
 	UserName     string         `json:"username"`
+	MediaURL     string         `json:"media_url"`
+	MediaCID     string         `json:"media_cid"`
 }
 
 func FromDomain(domain ads.Domain) Ads {
@@ -36,5 +38,7 @@ func FromDomain(domain ads.Domain) Ads {
 		CategoryName: domain.CategoryName,
 		UserID:       domain.UserID,
 		UserName:     domain.UserName,
+		MediaURL:     domain.MediaURL,
+		MediaCID:     domain.MediaCID,
 	}
 }

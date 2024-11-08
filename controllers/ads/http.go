@@ -6,7 +6,11 @@ import (
 	"go-ads-management/controllers/ads/request"
 	"go-ads-management/controllers/ads/response"
 	adsRecord "go-ads-management/drivers/mysql/ads"
+	"go-ads-management/drivers/pinata"
+	"go-ads-management/utils"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/morkid/paginate"
@@ -102,6 +106,34 @@ func (ac *AdsController) Create(c echo.Context) error {
 	if err := c.Validate(adsReq); err != nil {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "file not found", "")
+	}
+
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+
+	isFileValid := utils.ValidateFile(ext)
+
+	if !isFileValid {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "invalid file format", "")
+	}
+
+	cid, err := pinata.UploadFile(file)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "upload failed", "")
+	}
+
+	fileURL, err := pinata.GetSignedURL(cid)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to get file URL", "")
+	}
+
+	adsReq.MediaURL = fileURL
+	adsReq.MediaCID = cid
 
 	ads, err := ac.adsUseCase.Create(c.Request().Context(), adsReq.ToDomain())
 
