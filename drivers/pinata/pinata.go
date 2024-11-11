@@ -41,7 +41,6 @@ type PinataRequest struct {
 	Date    int64  `json:"date"`
 }
 
-// TODO: create custom payload that contains: id, cid, signed url -> use it in UploadFile()
 type UploadResponse struct {
 	FileID    string
 	FileCID   string
@@ -78,7 +77,7 @@ func UploadFile(file *multipart.FileHeader) (UploadResponse, error) {
 
 	// Make the request to Pinata API
 	url := "https://uploads.pinata.cloud/v3/files"
-	req, err := http.NewRequest("POST", url, &b)
+	req, err := http.NewRequest(http.MethodPost, url, &b)
 	if err != nil {
 		return UploadResponse{}, err
 	}
@@ -158,7 +157,7 @@ func getSignedURL(cid string) (string, error) {
 		return "", err
 	}
 
-	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
 
 	auth := fmt.Sprintf("Bearer %s", utils.GetConfig("PINATA_TOKEN"))
 
@@ -191,6 +190,27 @@ func getSignedURL(cid string) (string, error) {
 	return signedURLResponse.Data, nil
 }
 
-// func DeleteFile() {
+func DeleteFile(fileID string) error {
+	url := fmt.Sprintf("https://api.pinata.cloud/v3/files/%s", fileID)
 
-// }
+	req, _ := http.NewRequest(http.MethodDelete, url, nil)
+
+	auth := fmt.Sprintf("Bearer %s", utils.GetConfig("PINATA_TOKEN"))
+
+	req.Header.Add("Authorization", auth)
+
+	res, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	_, err = io.ReadAll(res.Body)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -187,8 +187,19 @@ func (ac *AdsController) Restore(c echo.Context) error {
 
 func (ac *AdsController) ForceDelete(c echo.Context) error {
 	adsID := c.Param("id")
+	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), adsID)
 
-	err := ac.adsUseCase.ForceDelete(c.Request().Context(), adsID)
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusNotFound, "failed", "content not found", "")
+	}
+
+	err = pinata.DeleteFile(ads.MediaID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to remove the media", "")
+	}
+
+	err = ac.adsUseCase.ForceDelete(c.Request().Context(), adsID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete an ad", "")
