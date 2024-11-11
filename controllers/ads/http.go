@@ -144,12 +144,50 @@ func (ac *AdsController) Update(c echo.Context) error {
 
 	adsReq := request.Ads{}
 
+	adsData, err := ac.adsUseCase.GetByID(c.Request().Context(), adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusNotFound, "failed", "ad not found", "")
+	}
+
 	if err := c.Bind(&adsReq); err != nil {
 		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
 	}
 
 	if err := c.Validate(adsReq); err != nil {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
+	}
+
+	file, err := c.FormFile("file")
+	if err == nil { // file is provided
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+
+		isFileValid := utils.ValidateFile(ext)
+
+		if !isFileValid {
+			return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "invalid file format", "")
+		}
+
+		res, err := pinata.UploadFile(file)
+		if err != nil {
+			return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "file upload failed", "")
+		}
+
+		if adsData.MediaID != "" {
+			err = pinata.DeleteFile(adsData.MediaID)
+			if err != nil {
+				return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete old file", "")
+			}
+		}
+
+		adsReq.MediaURL = res.SignedURL
+		adsReq.MediaCID = res.FileCID
+		adsReq.MediaID = res.FileID
+	} else {
+		// No new file provided, retain the old file data
+		adsReq.MediaURL = adsData.MediaURL
+		adsReq.MediaCID = adsData.MediaCID
+		adsReq.MediaID = adsData.MediaID
 	}
 
 	ads, err := ac.adsUseCase.Update(c.Request().Context(), adsReq.ToDomain(), adsID)

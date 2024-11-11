@@ -56,6 +56,8 @@ func UploadFile(file *multipart.FileHeader) (UploadResponse, error) {
 	defer src.Close()
 
 	// Prepare the multipart form for the Pinata API
+	file.Filename = utils.GenerateFilename(file)
+
 	var b bytes.Buffer
 	writer := multipart.NewWriter(&b)
 	part, err := writer.CreateFormFile("file", file.Filename)

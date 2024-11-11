@@ -101,6 +101,9 @@ func (ar *adsRepository) Update(ctx context.Context, adsReq *ads.Domain, id stri
 	updatedAds.StartDate = adsReq.StartDate
 	updatedAds.EndDate = adsReq.EndDate
 	updatedAds.CategoryID = adsReq.CategoryID
+	updatedAds.MediaURL = adsReq.MediaURL
+	updatedAds.MediaCID = adsReq.MediaCID
+	updatedAds.MediaID = adsReq.MediaID
 
 	if err := ar.conn.WithContext(ctx).Save(&updatedAds).Error; err != nil {
 		return ads.Domain{}, err
