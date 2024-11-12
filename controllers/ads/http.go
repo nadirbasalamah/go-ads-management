@@ -120,6 +120,12 @@ func (ac *AdsController) Create(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
+	err := utils.ValidateDate(adsReq.StartDate, adsReq.EndDate)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
+	}
+
 	file, err := c.FormFile("file")
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "file not found", "")
@@ -174,6 +180,12 @@ func (ac *AdsController) Update(c echo.Context) error {
 	}
 
 	if err := c.Validate(adsReq); err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
+	}
+
+	err = utils.ValidateDate(adsReq.StartDate, adsReq.EndDate)
+
+	if err != nil {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
