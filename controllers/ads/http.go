@@ -6,6 +6,7 @@ import (
 	"go-ads-management/controllers/ads/request"
 	"go-ads-management/controllers/ads/response"
 	adsRecord "go-ads-management/drivers/mysql/ads"
+	"go-ads-management/drivers/openai"
 	"go-ads-management/drivers/pinata"
 	"go-ads-management/utils"
 	"net/http"
@@ -294,4 +295,24 @@ func (ac *AdsController) ForceDelete(c echo.Context) error {
 	}
 
 	return controllers.NewResponse(c, http.StatusOK, "success", "ad deleted", "")
+}
+
+func (ac *AdsController) GenerateAd(c echo.Context) error {
+	var generateAdRequest openai.GenerateAdRequest
+
+	if err := c.Bind(&generateAdRequest); err != nil {
+		return controllers.NewResponse(c, http.StatusBadRequest, "failed", "invalid request", "")
+	}
+
+	if err := c.Validate(generateAdRequest); err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
+	}
+
+	res, err := openai.GenerateAd(c.Request().Context(), generateAdRequest)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", err.Error(), "")
+	}
+
+	return controllers.NewResponse(c, http.StatusOK, "success", "ad generated", res)
 }
