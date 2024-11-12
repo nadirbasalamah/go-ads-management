@@ -61,4 +61,5 @@ func (cl *ControllerList) RegisterRoute(e *echo.Echo) {
 	adsRoutes.POST("/ads/:id", cl.AdsController.Restore)
 	adsRoutes.DELETE("/ads/:id/force", cl.AdsController.ForceDelete)
 	adsRoutes.POST("/ads/generate", cl.AdsController.GenerateAd)
+	adsRoutes.POST("/ads/review/:id", cl.AdsController.ReviewAd)
 }

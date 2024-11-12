@@ -66,6 +66,17 @@ type GenerateAdResponse struct {
 	Description string `json:"description"`
 }
 
+type ReviewAdRequest struct {
+	Title       string `json:"title" validate:"required"`
+	Description string `json:"description" validate:"required"`
+}
+
+type ReviewAdResponse struct {
+	Review   string `json:"review"`
+	Score    string `json:"score"`
+	Feedback string `json:"feedback"`
+}
+
 func GenerateAd(ctx context.Context, request GenerateAdRequest) (GenerateAdResponse, error) {
 	// request
 	systemContent := fmt.Sprintf("You are marketing specialist for %s product", request.ProductName)
@@ -112,6 +123,60 @@ func GenerateAd(ctx context.Context, request GenerateAdRequest) (GenerateAdRespo
 	}
 
 	return adResponse, nil
+}
+
+func ReviewAd(ctx context.Context, request ReviewAdRequest) (ReviewAdResponse, error) {
+	// request
+	systemContent := "You are marketing specialist working with advertisement"
+
+	reviewStructure := `{"review":"ad review","score":"ad score","feedback":"ad feedback"}`
+
+	userContent := fmt.Sprintf(
+		`Write a review of the given advertisement structured as %s. The score is from 1 up to 10.
+		The advertisement is delimited with """.
+		
+		"""
+		Title: %s
+		Description: %s
+		"""
+		`,
+		reviewStructure,
+		request.Title,
+		request.Description,
+	)
+
+	requestBody := OpenAIRequest{
+		Model: utils.GetConfig("OPENAI_MODEL"),
+		Messages: []Message{
+			{
+				Role:    "system",
+				Content: systemContent,
+			},
+			{
+				Role:    "user",
+				Content: userContent,
+			},
+		},
+	}
+
+	response, err := sendRequest(ctx, requestBody)
+
+	if err != nil {
+		return ReviewAdResponse{}, err
+	}
+
+	responseContent := response.Choices[0].Message.Content
+
+	// re := regexp.MustCompile("(?s)```json\\s*(.*?)\\s*```")
+	// cleanedResponse := re.ReplaceAllString(responseContent, "$1")
+
+	var reviewResponse ReviewAdResponse
+
+	if err := json.Unmarshal([]byte(responseContent), &reviewResponse); err != nil {
+		return ReviewAdResponse{}, err
+	}
+
+	return reviewResponse, nil
 }
 
 func sendRequest(ctx context.Context, requestBody OpenAIRequest) (OpenAIResponse, error) {

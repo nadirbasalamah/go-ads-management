@@ -316,3 +316,32 @@ func (ac *AdsController) GenerateAd(c echo.Context) error {
 
 	return controllers.NewResponse(c, http.StatusOK, "success", "ad generated", res)
 }
+
+func (ac *AdsController) ReviewAd(c echo.Context) error {
+	adsID := c.Param("id")
+
+	aID, err := strconv.Atoi(adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), aID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusNotFound, "failed", "content not found", "")
+	}
+
+	reviewRequest := openai.ReviewAdRequest{
+		Title:       ads.Title,
+		Description: ads.Description,
+	}
+
+	res, err := openai.ReviewAd(c.Request().Context(), reviewRequest)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", err.Error(), "")
+	}
+
+	return controllers.NewResponse(c, http.StatusOK, "success", "ad review result generated", res)
+}
