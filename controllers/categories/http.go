@@ -6,6 +6,7 @@ import (
 	"go-ads-management/controllers/categories/request"
 	"go-ads-management/controllers/categories/response"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -39,7 +40,13 @@ func (cc *CategoryController) GetAll(c echo.Context) error {
 func (cc *CategoryController) GetByID(c echo.Context) error {
 	categoryID := c.Param("id")
 
-	category, err := cc.categoryUseCase.GetByID(c.Request().Context(), categoryID)
+	cID, err := strconv.Atoi(categoryID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	category, err := cc.categoryUseCase.GetByID(c.Request().Context(), cID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "category not found", "")
@@ -77,11 +84,17 @@ func (cc *CategoryController) Update(c echo.Context) error {
 
 	categoryID := c.Param("id")
 
+	cID, err := strconv.Atoi(categoryID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
 	if err := c.Validate(categoryReq); err != nil {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
-	category, err := cc.categoryUseCase.Update(c.Request().Context(), categoryReq.ToDomain(), categoryID)
+	category, err := cc.categoryUseCase.Update(c.Request().Context(), categoryReq.ToDomain(), cID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to update a category", "")
@@ -93,7 +106,13 @@ func (cc *CategoryController) Update(c echo.Context) error {
 func (cc *CategoryController) Delete(c echo.Context) error {
 	categoryID := c.Param("id")
 
-	err := cc.categoryUseCase.Delete(c.Request().Context(), categoryID)
+	cID, err := strconv.Atoi(categoryID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	err = cc.categoryUseCase.Delete(c.Request().Context(), cID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete a category", "")

@@ -20,11 +20,11 @@ func (usecase *adsUseCase) GetAll(ctx context.Context) (*gorm.DB, error) {
 	return usecase.adsRepository.GetAll(ctx)
 }
 
-func (usecase *adsUseCase) GetByID(ctx context.Context, id string) (Domain, error) {
+func (usecase *adsUseCase) GetByID(ctx context.Context, id int) (Domain, error) {
 	return usecase.adsRepository.GetByID(ctx, id)
 }
 
-func (usecase *adsUseCase) GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error) {
+func (usecase *adsUseCase) GetByCategory(ctx context.Context, categoryID int) (*gorm.DB, error) {
 	return usecase.adsRepository.GetByCategory(ctx, categoryID)
 }
 
@@ -40,18 +40,18 @@ func (usecase *adsUseCase) Create(ctx context.Context, adsReq *Domain) (Domain, 
 	return usecase.adsRepository.Create(ctx, adsReq)
 }
 
-func (usecase *adsUseCase) Update(ctx context.Context, adsReq *Domain, id string) (Domain, error) {
+func (usecase *adsUseCase) Update(ctx context.Context, adsReq *Domain, id int) (Domain, error) {
 	return usecase.adsRepository.Update(ctx, adsReq, id)
 }
 
-func (usecase *adsUseCase) Delete(ctx context.Context, id string) error {
+func (usecase *adsUseCase) Delete(ctx context.Context, id int) error {
 	return usecase.adsRepository.Delete(ctx, id)
 }
 
-func (usecase *adsUseCase) Restore(ctx context.Context, id string) (Domain, error) {
+func (usecase *adsUseCase) Restore(ctx context.Context, id int) (Domain, error) {
 	return usecase.adsRepository.Restore(ctx, id)
 }
 
-func (usecase *adsUseCase) ForceDelete(ctx context.Context, id string) error {
+func (usecase *adsUseCase) ForceDelete(ctx context.Context, id int) error {
 	return usecase.adsRepository.ForceDelete(ctx, id)
 }

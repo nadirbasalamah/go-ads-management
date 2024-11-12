@@ -33,7 +33,7 @@ func (cr *categoryRepository) GetAll(ctx context.Context) ([]categories.Domain, 
 	return categories, nil
 }
 
-func (cr *categoryRepository) GetByID(ctx context.Context, id string) (categories.Domain, error) {
+func (cr *categoryRepository) GetByID(ctx context.Context, id int) (categories.Domain, error) {
 	var category Category
 
 	if err := cr.conn.WithContext(ctx).First(&category, "id = ?", id).Error; err != nil {
@@ -59,7 +59,7 @@ func (cr *categoryRepository) Create(ctx context.Context, categoryReq *categorie
 	return record.ToDomain(), nil
 }
 
-func (cr *categoryRepository) Update(ctx context.Context, categoryReq *categories.Domain, id string) (categories.Domain, error) {
+func (cr *categoryRepository) Update(ctx context.Context, categoryReq *categories.Domain, id int) (categories.Domain, error) {
 	category, err := cr.GetByID(ctx, id)
 
 	if err != nil {
@@ -77,7 +77,7 @@ func (cr *categoryRepository) Update(ctx context.Context, categoryReq *categorie
 	return updatedCategory.ToDomain(), nil
 }
 
-func (cr *categoryRepository) Delete(ctx context.Context, id string) error {
+func (cr *categoryRepository) Delete(ctx context.Context, id int) error {
 	category, err := cr.GetByID(ctx, id)
 
 	if err != nil {

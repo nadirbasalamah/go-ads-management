@@ -25,7 +25,7 @@ func (ar *adsRepository) GetAll(ctx context.Context) (*gorm.DB, error) {
 	return stmt, nil
 }
 
-func (ar *adsRepository) GetByID(ctx context.Context, id string) (ads.Domain, error) {
+func (ar *adsRepository) GetByID(ctx context.Context, id int) (ads.Domain, error) {
 	var adsData Ads
 
 	if err := ar.conn.WithContext(ctx).Preload("Category").Preload("User").First(&adsData, "id = ?", id).Error; err != nil {
@@ -35,7 +35,7 @@ func (ar *adsRepository) GetByID(ctx context.Context, id string) (ads.Domain, er
 	return adsData.ToDomain(), nil
 }
 
-func (ar *adsRepository) GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error) {
+func (ar *adsRepository) GetByCategory(ctx context.Context, categoryID int) (*gorm.DB, error) {
 	stmt := ar.conn.WithContext(ctx).Joins("Category").Joins("User").Where("category_id = ?", categoryID).Model(Ads{})
 
 	return stmt, nil
@@ -83,7 +83,7 @@ func (ar *adsRepository) Create(ctx context.Context, adsReq *ads.Domain) (ads.Do
 	return record.ToDomain(), nil
 }
 
-func (ar *adsRepository) Update(ctx context.Context, adsReq *ads.Domain, id string) (ads.Domain, error) {
+func (ar *adsRepository) Update(ctx context.Context, adsReq *ads.Domain, id int) (ads.Domain, error) {
 	adsData, err := ar.GetByID(ctx, id)
 
 	if err != nil {
@@ -112,7 +112,7 @@ func (ar *adsRepository) Update(ctx context.Context, adsReq *ads.Domain, id stri
 	return updatedAds.ToDomain(), nil
 }
 
-func (ar *adsRepository) Delete(ctx context.Context, id string) error {
+func (ar *adsRepository) Delete(ctx context.Context, id int) error {
 	adsData, err := ar.GetByID(ctx, id)
 
 	if err != nil {
@@ -132,7 +132,7 @@ func (ar *adsRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (ar *adsRepository) Restore(ctx context.Context, id string) (ads.Domain, error) {
+func (ar *adsRepository) Restore(ctx context.Context, id int) (ads.Domain, error) {
 	var adsData Ads
 
 	err := ar.conn.WithContext(ctx).Unscoped().Preload("User").First(&adsData, "id = ?", id).Error
@@ -156,7 +156,7 @@ func (ar *adsRepository) Restore(ctx context.Context, id string) (ads.Domain, er
 	return adsData.ToDomain(), nil
 }
 
-func (ar *adsRepository) ForceDelete(ctx context.Context, id string) error {
+func (ar *adsRepository) ForceDelete(ctx context.Context, id int) error {
 	adsData, err := ar.GetByID(ctx, id)
 
 	if err != nil {

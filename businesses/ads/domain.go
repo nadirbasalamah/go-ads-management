@@ -27,26 +27,26 @@ type Domain struct {
 
 type UseCase interface {
 	GetAll(ctx context.Context) (*gorm.DB, error)
-	GetByID(ctx context.Context, id string) (Domain, error)
-	GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error)
+	GetByID(ctx context.Context, id int) (Domain, error)
+	GetByCategory(ctx context.Context, categoryID int) (*gorm.DB, error)
 	GetByUser(ctx context.Context) (*gorm.DB, error)
 	GetTrashed(ctx context.Context) (*gorm.DB, error)
 	Create(ctx context.Context, adsReq *Domain) (Domain, error)
-	Update(ctx context.Context, adsReq *Domain, id string) (Domain, error)
-	Delete(ctx context.Context, id string) error
-	Restore(ctx context.Context, id string) (Domain, error)
-	ForceDelete(ctx context.Context, id string) error
+	Update(ctx context.Context, adsReq *Domain, id int) (Domain, error)
+	Delete(ctx context.Context, id int) error
+	Restore(ctx context.Context, id int) (Domain, error)
+	ForceDelete(ctx context.Context, id int) error
 }
 
 type Repository interface {
 	GetAll(ctx context.Context) (*gorm.DB, error)
-	GetByID(ctx context.Context, id string) (Domain, error)
-	GetByCategory(ctx context.Context, categoryID string) (*gorm.DB, error)
+	GetByID(ctx context.Context, id int) (Domain, error)
+	GetByCategory(ctx context.Context, categoryID int) (*gorm.DB, error)
 	GetByUser(ctx context.Context) (*gorm.DB, error)
 	GetTrashed(ctx context.Context) (*gorm.DB, error)
 	Create(ctx context.Context, adsReq *Domain) (Domain, error)
-	Update(ctx context.Context, adsReq *Domain, id string) (Domain, error)
-	Delete(ctx context.Context, id string) error
-	Restore(ctx context.Context, id string) (Domain, error)
-	ForceDelete(ctx context.Context, id string) error
+	Update(ctx context.Context, adsReq *Domain, id int) (Domain, error)
+	Delete(ctx context.Context, id int) error
+	Restore(ctx context.Context, id int) (Domain, error)
+	ForceDelete(ctx context.Context, id int) error
 }

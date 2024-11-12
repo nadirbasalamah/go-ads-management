@@ -10,6 +10,7 @@ import (
 	"go-ads-management/utils"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -43,7 +44,13 @@ func (ac *AdsController) GetAll(c echo.Context) error {
 func (ac *AdsController) GetByID(c echo.Context) error {
 	adsID := c.Param("id")
 
-	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), adsID)
+	aID, err := strconv.Atoi(adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "ad not found", "")
@@ -55,7 +62,13 @@ func (ac *AdsController) GetByID(c echo.Context) error {
 func (ac *AdsController) GetByCategory(c echo.Context) error {
 	categoryID := c.Param("category_id")
 
-	ads, err := ac.adsUseCase.GetByCategory(c.Request().Context(), categoryID)
+	cID, err := strconv.Atoi(categoryID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	ads, err := ac.adsUseCase.GetByCategory(c.Request().Context(), cID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to fetch ads", "")
@@ -142,9 +155,15 @@ func (ac *AdsController) Create(c echo.Context) error {
 func (ac *AdsController) Update(c echo.Context) error {
 	adsID := c.Param("id")
 
+	aID, err := strconv.Atoi(adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
 	adsReq := request.Ads{}
 
-	adsData, err := ac.adsUseCase.GetByID(c.Request().Context(), adsID)
+	adsData, err := ac.adsUseCase.GetByID(c.Request().Context(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "ad not found", "")
@@ -190,7 +209,7 @@ func (ac *AdsController) Update(c echo.Context) error {
 		adsReq.MediaID = adsData.MediaID
 	}
 
-	ads, err := ac.adsUseCase.Update(c.Request().Context(), adsReq.ToDomain(), adsID)
+	ads, err := ac.adsUseCase.Update(c.Request().Context(), adsReq.ToDomain(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to update an ad", "")
@@ -202,7 +221,13 @@ func (ac *AdsController) Update(c echo.Context) error {
 func (ac *AdsController) Delete(c echo.Context) error {
 	adsID := c.Param("id")
 
-	err := ac.adsUseCase.Delete(c.Request().Context(), adsID)
+	aID, err := strconv.Atoi(adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	err = ac.adsUseCase.Delete(c.Request().Context(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete an ad", "")
@@ -214,7 +239,13 @@ func (ac *AdsController) Delete(c echo.Context) error {
 func (ac *AdsController) Restore(c echo.Context) error {
 	adsID := c.Param("id")
 
-	ads, err := ac.adsUseCase.Restore(c.Request().Context(), adsID)
+	aID, err := strconv.Atoi(adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	ads, err := ac.adsUseCase.Restore(c.Request().Context(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to restore an ad", "")
@@ -225,7 +256,14 @@ func (ac *AdsController) Restore(c echo.Context) error {
 
 func (ac *AdsController) ForceDelete(c echo.Context) error {
 	adsID := c.Param("id")
-	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), adsID)
+
+	aID, err := strconv.Atoi(adsID)
+
+	if err != nil {
+		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", "id must be valid integer", "")
+	}
+
+	ads, err := ac.adsUseCase.GetByID(c.Request().Context(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusNotFound, "failed", "content not found", "")
@@ -237,7 +275,7 @@ func (ac *AdsController) ForceDelete(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to remove the media", "")
 	}
 
-	err = ac.adsUseCase.ForceDelete(c.Request().Context(), adsID)
+	err = ac.adsUseCase.ForceDelete(c.Request().Context(), aID)
 
 	if err != nil {
 		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "failed to delete an ad", "")
