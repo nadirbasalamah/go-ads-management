@@ -2,7 +2,6 @@ package openai
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -66,7 +65,6 @@ type GenerateAdResponse struct {
 	Description string `json:"description"`
 }
 
-// FOR DEMO ONLY
 type ChannelResponse[T any] struct {
 	Response T
 	Error    error
@@ -83,55 +81,7 @@ type ReviewAdResponse struct {
 	Feedback string `json:"feedback"`
 }
 
-func GenerateAd(ctx context.Context, request GenerateAdRequest) (GenerateAdResponse, error) {
-	// request
-	systemContent := fmt.Sprintf("You are marketing specialist for %s product", request.ProductName)
-
-	adStructure := `{"title":"ad title","description":"ad description"}`
-
-	userContent := fmt.Sprintf(
-		"Write an %s advertisement in JSON format for a %s targeting %s, structured as %s",
-		request.Platform,
-		request.ProductName,
-		request.TargetAudience,
-		adStructure,
-	)
-
-	requestBody := OpenAIRequest{
-		Model: utils.GetConfig("OPENAI_MODEL"),
-		Messages: []Message{
-			{
-				Role:    "system",
-				Content: systemContent,
-			},
-			{
-				Role:    "user",
-				Content: userContent,
-			},
-		},
-	}
-
-	response, err := sendRequest(ctx, requestBody)
-
-	if err != nil {
-		return GenerateAdResponse{}, err
-	}
-
-	responseContent := response.Choices[0].Message.Content
-
-	re := regexp.MustCompile("(?s)```json\\s*(.*?)\\s*```")
-	cleanedResponse := re.ReplaceAllString(responseContent, "$1")
-
-	var adResponse GenerateAdResponse
-
-	if err := json.Unmarshal([]byte(cleanedResponse), &adResponse); err != nil {
-		return GenerateAdResponse{}, err
-	}
-
-	return adResponse, nil
-}
-
-func GenerateAdTrial(request GenerateAdRequest, ch chan ChannelResponse[GenerateAdResponse]) {
+func GenerateAd(request GenerateAdRequest, ch chan ChannelResponse[GenerateAdResponse]) {
 	// request
 	systemContent := fmt.Sprintf("You are marketing specialist for %s product", request.ProductName)
 
@@ -161,7 +111,7 @@ func GenerateAdTrial(request GenerateAdRequest, ch chan ChannelResponse[Generate
 
 	responsech := make(chan ChannelResponse[OpenAIResponse], 1)
 
-	go sendRequestTrial(requestBody, responsech)
+	sendRequest(requestBody, responsech)
 
 	response := <-responsech
 
@@ -186,11 +136,12 @@ func GenerateAdTrial(request GenerateAdRequest, ch chan ChannelResponse[Generate
 
 	ch <- ChannelResponse[GenerateAdResponse]{
 		Response: adResponse,
-		Error:    nil,
 	}
+
+	defer close(ch)
 }
 
-func ReviewAd(ctx context.Context, request ReviewAdRequest) (ReviewAdResponse, error) {
+func ReviewAd(request ReviewAdRequest, ch chan ChannelResponse[ReviewAdResponse]) {
 	// request
 	systemContent := "You are marketing specialist working with advertisement"
 
@@ -224,68 +175,42 @@ func ReviewAd(ctx context.Context, request ReviewAdRequest) (ReviewAdResponse, e
 		},
 	}
 
-	response, err := sendRequest(ctx, requestBody)
+	responsech := make(chan ChannelResponse[OpenAIResponse], 1)
 
-	if err != nil {
-		return ReviewAdResponse{}, err
+	sendRequest(requestBody, responsech)
+
+	response := <-responsech
+
+	if response.Error != nil {
+		ch <- ChannelResponse[ReviewAdResponse]{
+			Error: response.Error,
+		}
 	}
 
-	responseContent := response.Choices[0].Message.Content
+	responseContent := response.Response.Choices[0].Message.Content
 
 	var reviewResponse ReviewAdResponse
 
 	if err := json.Unmarshal([]byte(responseContent), &reviewResponse); err != nil {
-		return ReviewAdResponse{}, err
+		ch <- ChannelResponse[ReviewAdResponse]{
+			Error: response.Error,
+		}
 	}
 
-	return reviewResponse, nil
+	ch <- ChannelResponse[ReviewAdResponse]{
+		Response: reviewResponse,
+	}
+
+	defer close(ch)
 }
 
-func sendRequest(ctx context.Context, requestBody OpenAIRequest) (OpenAIResponse, error) {
-	jsonData, err := json.Marshal(requestBody)
-	if err != nil {
-		return OpenAIResponse{}, errors.New("error marshalling request body")
-	}
-
-	// send the request
-	apiKey := utils.GetConfig("OPENAI_API_KEY")
-	endpoint := "https://api.openai.com/v1/chat/completions"
-	body := bytes.NewBuffer(jsonData)
-
-	// Create a new HTTP POST request
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, body)
-	if err != nil {
-		return OpenAIResponse{}, errors.New("error creating request")
-	}
-
-	// Set the headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
-	// Send the request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return OpenAIResponse{}, errors.New("error sending request")
-	}
-	defer resp.Body.Close()
-
-	var data OpenAIResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return OpenAIResponse{}, errors.New("error parsing response")
-	}
-
-	return data, nil
-}
-
-func sendRequestTrial(requestBody OpenAIRequest, responsech chan ChannelResponse[OpenAIResponse]) {
+func sendRequest(requestBody OpenAIRequest, responsech chan ChannelResponse[OpenAIResponse]) {
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
 		responsech <- ChannelResponse[OpenAIResponse]{
 			Error: errors.New("error marshalling request body"),
 		}
+		return
 	}
 
 	// send the request
@@ -299,6 +224,7 @@ func sendRequestTrial(requestBody OpenAIRequest, responsech chan ChannelResponse
 		responsech <- ChannelResponse[OpenAIResponse]{
 			Error: errors.New("error creating request"),
 		}
+		return
 	}
 
 	// Set the headers
@@ -307,25 +233,32 @@ func sendRequestTrial(requestBody OpenAIRequest, responsech chan ChannelResponse
 
 	// Send the request
 	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		responsech <- ChannelResponse[OpenAIResponse]{
-			Error: errors.New("error sending request"),
+
+	go func() {
+		resp, err := client.Do(req)
+		if err != nil {
+			responsech <- ChannelResponse[OpenAIResponse]{
+				Error: errors.New("error sending request"),
+			}
+			return
 		}
-	}
-	defer resp.Body.Close()
 
-	var data OpenAIResponse
+		defer resp.Body.Close()
 
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		responsech <- ChannelResponse[OpenAIResponse]{
-			Error: errors.New("error parsing response"),
+		var data OpenAIResponse
+
+		err = json.NewDecoder(resp.Body).Decode(&data)
+		if err != nil {
+			responsech <- ChannelResponse[OpenAIResponse]{
+				Error: errors.New("error parsing response"),
+			}
+			return
 		}
-	}
 
-	responsech <- ChannelResponse[OpenAIResponse]{
-		Error:    nil,
-		Response: data,
-	}
+		responsech <- ChannelResponse[OpenAIResponse]{
+			Response: data,
+		}
+
+		defer close(responsech)
+	}()
 }
