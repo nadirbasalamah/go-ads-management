@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -45,9 +46,15 @@ func main() {
 
 	_dbDriver.MigrateDB(db)
 
+	expireDuration, err := strconv.Atoi(utils.GetConfig("JWT_EXPIRE_DURATION"))
+
+	if err != nil {
+		log.Fatalf("error when parsing expire duration: %v\n", err)
+	}
+
 	configJWT := _middlewares.JWTConfig{
 		SecretKey:       utils.GetConfig("JWT_SECRET_KEY"),
-		ExpiresDuration: 1,
+		ExpiresDuration: expireDuration,
 	}
 
 	configLogger := _middlewares.LoggerConfig{

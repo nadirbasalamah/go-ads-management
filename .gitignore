@@ -26,3 +26,4 @@ tmp/
 .vscode
 .air.toml
 test.session.sql
+generated
