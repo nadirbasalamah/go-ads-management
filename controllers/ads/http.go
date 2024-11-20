@@ -308,13 +308,27 @@ func (ac *AdsController) GenerateAd(c echo.Context) error {
 		return controllers.NewResponse(c, http.StatusUnprocessableEntity, "failed", err.Error(), "")
 	}
 
-	res, err := openai.GenerateAd(c.Request().Context(), generateAdRequest)
+	// res, err := openai.GenerateAd(c.Request().Context(), generateAdRequest)
 
-	if err != nil {
-		return controllers.NewResponse(c, http.StatusInternalServerError, "failed", err.Error(), "")
+	// if err != nil {
+	// 	return controllers.NewResponse(c, http.StatusInternalServerError, "failed", err.Error(), "")
+	// }
+
+	// return controllers.NewResponse(c, http.StatusOK, "success", "ad generated", res)
+
+	adch := make(chan openai.ChannelResponse[openai.GenerateAdResponse], 1)
+
+	go openai.GenerateAdTrial(generateAdRequest, adch)
+
+	select {
+	case result := <-adch:
+		if result.Error != nil {
+			return controllers.NewResponse(c, http.StatusInternalServerError, "failed", "request failed", "")
+		}
+		return controllers.NewResponse(c, http.StatusOK, "success", "ad generated", result.Response)
+	case <-c.Request().Context().Done():
+		return nil
 	}
-
-	return controllers.NewResponse(c, http.StatusOK, "success", "ad generated", res)
 }
 
 func (ac *AdsController) ReviewAd(c echo.Context) error {
