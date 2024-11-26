@@ -135,7 +135,7 @@ func (ar *adsRepository) Delete(ctx context.Context, id int) error {
 func (ar *adsRepository) Restore(ctx context.Context, id int) (ads.Domain, error) {
 	var adsData Ads
 
-	err := ar.conn.WithContext(ctx).Unscoped().Preload("User").First(&adsData, "id = ?", id).Error
+	err := ar.conn.WithContext(ctx).Unscoped().Preload("Category").Preload("User").First(&adsData, "id = ?", id).Error
 
 	if err != nil {
 		return ads.Domain{}, err
