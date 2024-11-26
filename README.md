@@ -68,9 +68,7 @@ docker compose down
 
 ## Documentation
 
-> 🚧 The documentation is currently in progress..
-
-The application documentation is available [here](#).
+The application documentation is available [here](https://documenter.getpostman.com/view/5781191/2sAYBVgqzx).
 
 ## Additional Notes
 
